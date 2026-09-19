@@ -1,7 +1,7 @@
 # 🎯 InterviewIQ — Simulador Inteligente de Entrevistas para Universitarios
 
 > **Curso:** AD5018 – Inteligencia Artificial para Negocios · UTEC · 2026-2
-> **Framework:** PROMPT v2.0 · **Fase actual:** PC1 (Semanas 1–6)
+**Fase actual:** PC1 (Semanas 1–6)
 
 ---
 
