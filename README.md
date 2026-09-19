@@ -5,6 +5,14 @@
 
 ---
 
+## 📁 Enlace a Google Drive
+
+Puedes acceder a los archivos del proyecto aquí:
+
+[**Abrir carpeta de Google Drive**](https://drive.google.com/drive/folders/1wYccFQQyo-KJUpOaO0SIYYZBWSTLlr4V?usp=sharing)
+
+---
+
 ## 1. Problema
 
 Los estudiantes universitarios peruanos de últimos ciclos que buscan prácticas preprofesionales o su primer empleo tienen dificultad para preparar y mejorar sus respuestas en entrevistas laborales por competencias porque cuentan con oportunidades limitadas de práctica recurrente con retroalimentación estructurada, lo que genera bajos niveles de preparación percibida y dificultades para estructurar respuestas conductuales.
