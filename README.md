@@ -80,8 +80,8 @@ El clasificador A2 detecta los componentes STAR presentes/ausentes y envía ese 
 
 | Modelo | Tipo | Rol |
 |---|---|---|
-| TF-IDF + Logistic Regression | Baseline clásico | Referencia mínima |
-| BETO / DistilBERT multilingüe | Transformer fine-tuned | Modelo alternativo |
+| TF-IDF + Logistic Regression | Baseline clásico | Modelo de referencia |
+| TF-IDF + Linear SVM | Clasificador lineal | Modelo alternativo |
 
 **Dataset — propio construido por el equipo:**
 
@@ -226,8 +226,8 @@ Documentos fuente (guías STAR, ejemplos por sector, tips de entrevista)
 | Capa | Tecnología | Estado |
 |---|---|---|
 | Lenguaje | Python 3.11+ | Confirmado |
-| ML baseline | scikit-learn (TF-IDF + LR) | Confirmado |
-| NLP / Transformers | HuggingFace — BETO / DistilBERT | PENDIENTE DE VALIDAR |
+| ML baseline | scikit-learn — TF-IDF + Logistic Regression | Confirmado |
+| ML alternativo | scikit-learn — TF-IDF + Linear SVM | Confirmado |
 | Vector DB | FAISS / ChromaDB | PENDIENTE DE VALIDAR |
 | LLM API | OpenAI GPT-4o-mini | PENDIENTE DE VALIDAR |
 | Frontend MVP | Streamlit | PENDIENTE DE VALIDAR |
@@ -258,10 +258,10 @@ proyecto-entrevistas-ia/
 │   └── README_data.md
 │
 ├── notebooks/
-│   ├── 01_exploracion_datos.ipynb
-│   ├── 02_baseline_tfidf_lr.ipynb
-│   ├── 03_modelo_alternativo_beto.ipynb
-│   └── 04_rag_pipeline.ipynb
+├── 01_exploracion_datos.ipynb
+├── 02_baseline_tfidf_lr.ipynb
+├── 03_modelo_alternativo_svm.ipynb
+└── 04_rag_pipeline.ipynb
 │
 ├── src/
 │   ├── classifier/
@@ -270,7 +270,7 @@ proyecto-entrevistas-ia/
 │
 ├── models/
 │   ├── baseline_tfidf_lr.pkl
-│   └── beto_finetuned/
+│   └── svm_star.pkl
 │
 ├── evaluation/
 │   ├── comparacion_modelos_a2.md
@@ -301,11 +301,11 @@ proyecto-entrevistas-ia/
 
 ## 14. Integrantes
 
-| Nombre | Rol | Email |
+| Nombre | Email |
 |---|---|---|
-| Valeria Briceño | 
-| Lucía Rodríguez | 
-| Aaron Van Oord |
+| Valeria Briceño | valeria.briceno@utec.edu.pe |
+| Lucía Rodríguez | lucia.rodriguez@utec.edu.pe |
+| Aaron Van Oord | aaron.vanoordt@utec.edu.pe |
 
 ---
 
@@ -319,7 +319,7 @@ proyecto-entrevistas-ia/
 | Plantilla 2 — Data Readiness | ⏳ Pendiente |
 | Plantilla 3 — AI Product Canvas | ⏳ Pendiente |
 | Dataset A2 — decisión | ⏳ Pendiente |
-| Arquitectura A2 | ✅ Definida — baseline TF-IDF + LR vs. BETO |
+| Arquitectura A2 | ✅ Definida — baseline TF-IDF + Linear SVM |
 | Arquitectura G2 — RAG | ✅ Hipótesis definida |
 | OKRs formales | ⏳ Pendiente |
 | Cronograma detallado | ⏳ Pendiente |
