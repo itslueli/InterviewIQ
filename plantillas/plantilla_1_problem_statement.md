@@ -122,5 +122,5 @@ El componente analítico permite evaluar de manera consistente la estructura de 
 | ¿La elección de niveles se justifica con el problema, no con la preferencia del equipo? | **SÍ** |
 | ¿El equipo declaró en cuál de los dos ejes concentra su ambición? | **SÍ — A2 + G2** |
 | ¿El componente analítico implica entrenar un modelo, no solo consumir una API? | **SÍ** |
-| ¿Todos los integrantes pueden explicar este canvas sin leerlo? | **PENDIENTE DE VALIDACIÓN INTERNA** |
+| ¿Todos los integrantes pueden explicar este canvas sin leerlo? | **SÍ** |
 
