@@ -302,7 +302,7 @@ proyecto-entrevistas-ia/
 ## 14. Integrantes
 
 | Nombre | Email |
-|---|---|---|
+|---|---|
 | Valeria Briceño | valeria.briceno@utec.edu.pe |
 | Lucía Rodríguez | lucia.rodriguez@utec.edu.pe |
 | Aaron Van Oord | aaron.vanoordt@utec.edu.pe |
