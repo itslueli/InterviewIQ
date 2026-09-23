@@ -1,5 +1,5 @@
 # Plantilla 1 — Problem Statement Canvas
-## Framework PROMPT | Fase P — Problema de Negocio
+## Problema de Negocio
 ### AD5018 Inteligencia Artificial para Negocios | UTEC
 
 ---
@@ -8,10 +8,6 @@
 - Integrante 1: Valeria Briceño
 - Integrante 2: Lucia Rodriguez
 - Integrante 3: Aaron Van Oord
-
-
-**Fecha de entrega:** 19/09/2026  
-**Versión del canvas:** v1
 
 ---
 
@@ -27,8 +23,7 @@ Los estudiantes tienen oportunidades limitadas para practicar entrevistas labora
 La práctica individual de entrevistas no proporciona retroalimentación externa sobre la estructura y claridad de las respuestas, mientras que practicar repetidamente con una persona que pueda simular una entrevista y brindar feedback depende de la disponibilidad de terceros. Esto limita la posibilidad de practicar, identificar deficiencias y corregirlas de manera recurrente antes de una entrevista real.
 
 ### 1.4 Consecuencia medible
-En una muestra objetivo de 50 estudiantes universitarios de últimos ciclos, valido que aproximadamente **60%** se siente poco o nada preparado para afrontar entrevistas laborales por competencias, **40%** rara vez o nunca recibe retroalimentación estructurada al practicar entrevistas y **80%** reporta al menos alguna dificultad para estructurar ejemplos concretos al responder preguntas conductuales.
-
+En una muestra objetivo de 50 estudiantes universitarios de últimos ciclos, se validó que aproximadamente **60%** se siente poco o nada preparado para afrontar entrevistas laborales por competencias, **40%** rara vez o nunca recibe retroalimentación estructurada al practicar entrevistas y **80%** reporta al menos alguna dificultad para estructurar ejemplos concretos al responder preguntas conductuales.
 
 ### 1.5 Declaración del problema — formato obligatorio
 Los estudiantes universitarios peruanos de últimos ciclos que buscan prácticas preprofesionales o su primer empleo tienen dificultad para preparar y mejorar sus respuestas en entrevistas laborales por competencias porque cuentan con oportunidades limitadas de práctica recurrente con retroalimentación estructurada, lo que genera bajos niveles de preparación percibida y dificultades para estructurar respuestas conductuales.
@@ -56,7 +51,13 @@ La IA es adecuada porque el problema involucra analizar respuestas abiertas de m
 
 **¿Qué va a predecir, clasificar o agrupar?**
 
-El modelo identificará la presencia o ausencia de los componentes **Situación, Tarea, Acción y Resultado (STAR)** en las respuestas textuales del usuario a preguntas conductuales.
+El sistema utilizará **dos etapas de clasificación** que trabajan en secuencia:
+
+**Etapa 1 — Diagnóstico de nivel de preparación:**
+Un clasificador procesará las respuestas del estudiante a un cuestionario diagnóstico inicial (experiencia previa, conocimiento de STAR, nivel de confianza autodeclarada, dificultad para estructurar respuestas y frecuencia de feedback recibido) para asignarle un nivel de preparación. Este nivel adapta la dificultad y el tipo de preguntas conductuales que se generarán en la sesión de práctica.
+
+**Etapa 2 — Detección de componentes STAR:**
+El modelo principal identificará la presencia o ausencia de los componentes **Situación, Tarea, Acción y Resultado (STAR)** en las respuestas textuales del usuario a las preguntas conductuales.
 
 **Tipo de tarea:**
 - [x] **Clasificación**
@@ -68,13 +69,16 @@ El modelo identificará la presencia o ausencia de los componentes **Situación,
 - [x] **A2** — compara modelos y ajusta el umbral según el costo del error
 - [ ] **A3**
 
-**Compromiso A2:** se entrenará un baseline y al menos un modelo alternativo. Se compararán con métricas adecuadas para la clasificación STAR y se justificará el umbral considerando el costo de falsos positivos y falsos negativos.
+**Compromiso A2:** se entrenará un baseline y al menos un modelo alternativo para la detección STAR. Se compararán con métricas adecuadas y se justificará el umbral considerando el costo de falsos positivos y falsos negativos.
 
 ### 3.2 Componente generativo — qué va a hacer la capa de lenguaje
 
 **¿Qué comunica, decide o ejecuta?**
 
-Generará preguntas conductuales contextualizadas al puesto objetivo y retroalimentación personalizada sobre cada respuesta, utilizando el resultado del clasificador y conocimiento recuperado de fuentes seleccionadas sobre entrevistas y metodología STAR.
+La capa generativa cumple dos funciones según la etapa del flujo:
+
+1. **Generación de preguntas conductuales adaptadas** al puesto objetivo y al nivel de preparación detectado en la etapa diagnóstica.
+2. **Generación de retroalimentación personalizada** sobre cada respuesta del usuario, utilizando el resultado del clasificador STAR (Etapa 2) y conocimiento recuperado de fuentes seleccionadas sobre entrevistas y metodología STAR.
 
 **Nivel de profundidad elegido:**
 - [ ] **G1**
@@ -90,7 +94,27 @@ Generará preguntas conductuales contextualizadas al puesto objetivo y retroalim
 
 **¿Qué dato exactamente viaja de un componente al otro?**
 
-El componente analítico envía a la capa generativa las predicciones sobre presencia o ausencia de cada componente STAR detectado (S, T, A y R), junto con la respuesta original del usuario. La capa generativa combina ese resultado con información recuperada mediante RAG para elaborar retroalimentación específica.
+El flujo completo del sistema es el siguiente:
+
+```
+[Cuestionario diagnóstico]
+        ↓
+[Clasificador de nivel de preparación — Logistic Regression]
+Output: nivel ∈ {básico, intermedio, avanzado}
+        ↓
+[Generación de preguntas adaptadas al rol y nivel — LLM]
+        ↓
+[Respuesta del usuario en texto libre]
+        ↓
+[Clasificador STAR — A2 (TF-IDF + LR o SVM)]
+Output: S ∈ {0,1}, T ∈ {0,1}, A ∈ {0,1}, R ∈ {0,1}
+        ↓
+[RAG: recuperación de contexto relevante del corpus]
+        ↓
+[LLM genera feedback personalizado — G2]
+```
+
+El clasificador de nivel (Etapa 1) envía el nivel asignado al generador de preguntas. El clasificador STAR (Etapa 2) envía a G2 las predicciones de presencia/ausencia de S, T, A y R junto con la respuesta original. G2 combina ese resultado con los fragmentos recuperados del corpus para elaborar retroalimentación específica.
 
 ### 3.4 Dónde va la ambición del equipo
 
@@ -100,10 +124,10 @@ El componente analítico envía a la capa generativa las predicciones sobre pres
 
 **¿Por qué esa elección?**
 
-El equipo adopta A2 + G2 porque el problema requiere tanto una evaluación confiable de respuestas abiertas como retroalimentación contextualizada. En el componente analítico se compararán modelos para seleccionar el enfoque que identifique mejor los componentes STAR y se justificará el umbral de clasificación. El RAG permitirá generar feedback apoyado en fuentes seleccionadas sobre entrevistas y metodología STAR. Este alcance equilibra profundidad técnica y viabilidad dentro del tiempo disponible.
+El equipo adopta A2 + G2 porque el problema requiere tanto una evaluación confiable de respuestas abiertas como retroalimentación contextualizada. Dentro del componente analítico se incorpora un diagnóstico inicial del nivel de preparación del estudiante, lo que permite adaptar las preguntas a su perfil antes de iniciar la práctica STAR. En la detección STAR se compararán modelos para seleccionar el que mejor identifique los componentes y se justificará el umbral de clasificación. El RAG permitirá generar feedback apoyado en fuentes seleccionadas. Este alcance equilibra profundidad técnica y viabilidad dentro del tiempo disponible.
 
 ### 3.5 Justificación general
-El componente analítico permite evaluar de manera consistente la estructura de respuestas conductuales mediante la detección de componentes STAR. La capa generativa convierte ese resultado técnico en retroalimentación comprensible y contextualizada para el estudiante. El uso de RAG permite fundamentar el feedback en fuentes seleccionadas sobre entrevistas y metodología STAR, en lugar de depender únicamente del conocimiento general del LLM. La combinación A2 + G2 permite evaluar, explicar y orientar la mejora de cada respuesta manteniendo un alcance viable para el MVP.
+El diagnóstico inicial de nivel de preparación personaliza la experiencia desde el primer momento, evitando preguntas demasiado fáciles para usuarios avanzados o demasiado exigentes para usuarios básicos. El clasificador STAR permite evaluar de manera consistente la estructura de las respuestas conductuales. La capa generativa convierte ese resultado técnico en retroalimentación comprensible y contextualizada. El uso de RAG permite fundamentar el feedback en fuentes seleccionadas sobre metodología STAR, en lugar de depender únicamente del conocimiento general del LLM. La combinación A2 + G2 permite diagnosticar, adaptar, evaluar y orientar la mejora de cada respuesta manteniendo un alcance viable para el MVP.
 
 ### 3.6 Solo si el equipo solicita la excepción
 - [ ] Solicitamos excepción al componente analítico
@@ -122,5 +146,5 @@ El componente analítico permite evaluar de manera consistente la estructura de 
 | ¿La elección de niveles se justifica con el problema, no con la preferencia del equipo? | **SÍ** |
 | ¿El equipo declaró en cuál de los dos ejes concentra su ambición? | **SÍ — A2 + G2** |
 | ¿El componente analítico implica entrenar un modelo, no solo consumir una API? | **SÍ** |
+| ¿El flujo completo entre las dos etapas de clasificación y G2 está descrito? | **SÍ** |
 | ¿Todos los integrantes pueden explicar este canvas sin leerlo? | **SÍ** |
-
