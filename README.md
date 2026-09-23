@@ -181,5 +181,3 @@ InterviewIQ/
 - Las fuentes del corpus RAG están verificadas y se documentan sus licencias de uso.
 
 ---
-
-*Framework PROMPT v2.0 — AD5018 UTEC 2026-2 | InterviewIQ PC1*
