@@ -1,7 +1,7 @@
 # InterviewIQ — Simulador Inteligente de Entrevistas por Competencias
 ## AD5018 Inteligencia Artificial para Negocios · UTEC 2026-2
 
-**Equipo:** Valeria Briceño · Lucía Rodríguez · Aaron Van Oord
+**Equipo:** Valeria Briceño · Lucía Rodríguez · Jennifer Patiño · Aaron Van Oord
 
 ---
 
