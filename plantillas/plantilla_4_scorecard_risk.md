@@ -2,8 +2,7 @@
 
 **Proyecto:** InterviewIQ  
 **Curso:** AD5018 — Inteligencia Artificial para Negocios · UTEC 2026-2  
-**Equipo:** InterviewIQ  
-**Fecha:** Noviembre 2026  
+**Equipo:** Lucía Rodríguez · Valeria Briceño · Jennifer Patiño · Aaron Van Oord  
 **Semana de evaluación:** 14 (PC2)
 
 ---
@@ -14,11 +13,11 @@
 
 | KR | Descripción | Meta PC1 | Resultado real | Cumple |
 |----|-------------|----------|---------------|--------|
-| KR1 | Reducir tasa de respuestas sin estructura STAR de estudiantes que usan InterviewIQ | 60% → ≤40% | Pendiente validación con usuarios reales (deploy en curso) | 🔄 En medición |
+| KR1 | Reducir tasa de respuestas sin estructura STAR de estudiantes que usan InterviewIQ | 60% → ≤40% | Pendiente validación con usuarios reales | 🔄 En medición |
 | KR2 | Reducir respuestas que omiten el componente "Resultado" (R) | 80% → ≤55% | Pendiente validación con usuarios reales | 🔄 En medición |
 | KR3 | Aumentar respuestas con los 4 componentes STAR presentes | 40% → ≥90% de usuarios que completan el flujo | Pendiente validación con usuarios reales | 🔄 En medición |
 
-> **Nota:** Los KRs se medirán con las pruebas de usuario documentadas en `mvp/evidencia/pruebas_usuario.md`. El modelo ya está entrenado y desplegado; los datos de impacto real se registran en la semana de sustentación.
+> Los KRs se medirán con las pruebas de usuario documentadas en `mvp/evidencia/pruebas_usuario.md`. El modelo ya está entrenado y desplegado; los datos de impacto real se registran en la semana de sustentación.
 
 ---
 
@@ -57,27 +56,26 @@ El error más costoso en InterviewIQ es el **Falso Positivo**: decirle al estudi
 
 | Componente | Tasa FP (umbral ajustado) | Riesgo | Acción tomada |
 |------------|--------------------------|--------|---------------|
-| S — Situación | 25.0% | 🔴 Alto | Umbral subido a 0.30 (desde default 0.50) |
-| T — Tarea | 33.3% | 🔴 Alto | Umbral subido a 0.30 |
-| A — Acción | 9.1% | 🟢 Bajo | Umbral subido a 0.75 |
-| R — Resultado | 7.7% | 🟢 Bajo | Umbral subido a 0.70 |
+| S — Situación | 25.0% | 🔴 Alto | Umbral 0.30 |
+| T — Tarea | 33.3% | 🔴 Alto | Umbral 0.30 |
+| A — Acción | 9.1% | 🟢 Bajo | Umbral 0.75 |
+| R — Resultado | 7.7% | 🟢 Bajo | Umbral 0.70 |
 
 > Los umbrales fueron ajustados en el set de validación usando scoring combinado: maximizar F1 y penalizar tasa FP (puntuación = F1 − 0.5 × tasa_FP).
 
 ---
 
-### A3. Métrica del Componente Generativo (G2 — RAG + GPT-4o-mini)
+### A3. Métrica del Componente Generativo (G2 — Feedback por reglas)
 
 **Nivel declarado en PC1:** G2 (RAG)  
-**Implementación actual:** Feedback basado en reglas (modo sin API key) + GPT-4o-mini opcional (con API key del usuario)
+**Implementación en MVP:** Feedback basado en reglas estructuradas (G1). El RAG completo quedó fuera del alcance del MVP por restricciones de tiempo y dependencia de API key del usuario.
 
 | Métrica | Meta PC1 | Resultado | Cumple |
 |---------|----------|-----------|--------|
-| Precision@k del RAG | ≥ 0.80 | Pendiente — RAG completo en desarrollo | 🔄 |
 | Feedback coherente con output A2 | Patrón 1 siempre activo | ✅ G2 siempre recibe output de A2 | ✅ |
-| Latencia de respuesta | < 5 seg | ~1-2 seg (modo reglas), ~3-4 seg (GPT-4o-mini) | ✅ |
+| Latencia de respuesta | < 5 seg | ~1-2 seg (modo reglas) | ✅ |
 
-> **Decisión documentada:** El MVP en la demo usa feedback basado en reglas por defecto para garantizar disponibilidad sin depender de API key. El módulo GPT-4o-mini está integrado y se activa cuando el usuario ingresa su API key en la interfaz.
+> **Decisión documentada:** El MVP usa feedback basado en reglas por defecto para garantizar disponibilidad sin depender de API key ni servicios externos. La Etapa 1 de clasificación de nivel de preparación también quedó fuera del MVP actual.
 
 ---
 
@@ -97,15 +95,14 @@ El error más costoso en InterviewIQ es el **Falso Positivo**: decirle al estudi
 
 | # | Riesgo | Probabilidad | Impacto | Nivel | Mitigación concreta |
 |---|--------|-------------|---------|-------|---------------------|
-| R4 | GPT-4o-mini genera feedback genérico que no conecta con la respuesta del usuario | Media | Medio | 🟡 Moderado | El prompt del sistema incluye el output exacto de A2 (componentes detectados/ausentes). Se testea con 5+ respuestas reales antes de la sustentación. |
-| R5 | Dependencia de API externa (OpenAI) — si cae, el feedback no funciona | Media | Alto | 🟡 Moderado | El sistema tiene fallback automático a feedback basado en reglas. El MVP funciona sin API key. |
-| R6 | El modelo genera feedback que el estudiante interpreta como garantía de éxito en entrevista real | Baja | Alto | 🟡 Moderado | La interfaz incluye disclaimer visible: "InterviewIQ es una herramienta de práctica, no una evaluación oficial." |
+| R4 | El feedback basado en reglas no conecta con el contexto específico del usuario | Media | Medio | 🟡 Moderado | El sistema de reglas está diseñado por componente STAR: cada combinación de presentes/ausentes produce un mensaje diferente. Se testea con 5+ respuestas reales antes de la sustentación. |
+| R5 | El modelo genera feedback que el estudiante interpreta como garantía de éxito en entrevista real | Baja | Alto | 🟡 Moderado | La interfaz incluye disclaimer visible: "InterviewIQ es una herramienta de práctica, no una evaluación oficial." |
 
 #### Riesgo de acción no deseada (aplica si se agrega agente)
 
 | # | Riesgo | Probabilidad | Impacto | Nivel | Mitigación concreta |
 |---|--------|-------------|---------|-------|---------------------|
-| R7 | Si se implementa agente n8n: el agente registra datos de usuarios sin consentimiento explícito | Baja | Crítico | 🔴 Crítico | Se solicitará consentimiento explícito antes del registro. Los datos se anonimizarán. Aplica Ley N.° 29733. |
+| R6 | Si se implementa agente n8n: el agente registra datos de usuarios sin consentimiento explícito | Baja | Crítico | 🔴 Crítico | Se solicitará consentimiento explícito antes del registro. Los datos se anonimizarán. Aplica Ley N.° 29733. |
 
 ---
 
@@ -125,7 +122,7 @@ InterviewIQ procesa respuestas de texto libre que pueden contener información p
 | Obligación legal | Implementación en InterviewIQ |
 |-----------------|-------------------------------|
 | Consentimiento informado (Art. 13) | La app muestra aviso visible antes del análisis: "Tus respuestas se procesan para darte feedback. No se almacenan." |
-| Finalidad específica (Art. 8) | Los datos se usan exclusivamente para clasificación STAR. No se envían a terceros salvo OpenAI (con consentimiento del usuario al ingresar su API key). |
+| Finalidad específica (Art. 8) | Los datos se usan exclusivamente para clasificación STAR. No se envían a terceros. |
 | No almacenamiento sin consentimiento | El MVP no persiste respuestas del usuario. Streamlit no guarda texto entre sesiones. |
 | Seguridad (Art. 16) | La comunicación es HTTPS (Streamlit Community Cloud). No hay base de datos con datos personales. |
 
@@ -133,7 +130,6 @@ InterviewIQ procesa respuestas de texto libre que pueden contener información p
 
 El MVP informa visiblemente al usuario que está interactuando con IA mediante:
 - Encabezado: "InterviewIQ — Análisis con IA"
-- Footer con enlace al repositorio público
 - Disclaimer en la sección de feedback: "Este análisis es generado automáticamente por un modelo de IA entrenado con datos sintéticos."
 
 ---
@@ -144,7 +140,6 @@ El MVP informa visiblemente al usuario que está interactuando con IA mediante:
 |-----------|----------------|-------------------|
 | El modelo dice que falta Situación, pero sí estaba presente (FN) | El estudiante recibe feedback innecesario sobre cómo añadir contexto | El feedback de FN es constructivo y no dañino: en el peor caso el estudiante aprende algo extra. |
 | El modelo dice que la Acción está presente, pero no lo estaba (FP) | El estudiante no recibe el consejo correcto sobre qué mejorar | Se minimiza con umbral 0.75 para Acción. Las probabilidades se muestran para que el usuario las evalúe. |
-| GPT-4o-mini genera feedback incorrecto | El estudiante recibe una sugerencia equivocada | El feedback se etiqueta como sugerencia, no como evaluación. El usuario puede ignorarlo o pedir otra opinión. |
 | El MVP no está disponible el día de la sustentación | El evaluador no puede acceder | El deploy está en Streamlit Community Cloud (SLA 99.9%). Se tiene screenshot de demostración como respaldo. |
 
 ---
