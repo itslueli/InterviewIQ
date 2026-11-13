@@ -341,12 +341,12 @@ NOMBRES_STAR = {
 }
 MODELS_DIR = Path(__file__).parent / "models"
 
-@st.cache_resource
+@st.cache_resource(ttl=300)
 def cargar_modelos():
     cfg = MODELS_DIR / "config_clasificador.json"
     if not cfg.exists(): return None, None
     with open(cfg) as f: c = json.load(f)
-    u = c.get("umbrales", {"situacion":0.30,"tarea":0.30,"accion":0.75,"resultado":0.70})
+    u = c.get("umbrales", {"situacion":0.30,"tarea":0.30,"accion":0.75,"resultado":0.50})
     m = {}
     for et in ETIQUETAS:
         p = MODELS_DIR / f"clasificador_star_{et}.pkl"
