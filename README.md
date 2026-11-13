@@ -218,5 +218,5 @@ Ver detalle en `plantillas/plantilla_3_technical_decisions.md`.
 | Documentación (plantillas 1-4) | | ✓ | | |
 | Resumen ejecutivo | | ✓ | | |
 | Presentación PC2 | | | | ✓ |
-| Métricas y análisis del modelo | | | ✓ | |
+| Métricas y análisis del modelo | |✓ |  | |
 | OKRs y medición de impacto | ✓ | | | |
