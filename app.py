@@ -1,6 +1,6 @@
 """
 InterviewIQ — MVP Streamlit
-Componente A2: Clasificador STAR + G2: feedback con Gemini
+A2: Clasificador STAR + G2: feedback con Gemini
 AD5018 IA para Negocios — UTEC 2026-2
 """
 
@@ -14,435 +14,317 @@ from pathlib import Path
 st.set_page_config(
     page_title="InterviewIQ",
     page_icon="🎯",
-    layout="wide",
+    layout="centered",
     initial_sidebar_state="collapsed",
 )
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  CSS
-# ══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
-
-*, *::before, *::after { box-sizing: border-box; }
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
 html, body, [class*="css"] {
-    font-family: 'DM Sans', sans-serif;
-    background: #F0F2FF !important;
-    color: #1A1A2E;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    background: #ffffff !important;
+    color: #111827 !important;
 }
-.stApp { background: #F0F2FF !important; }
-
-/* ── Ocultar chrome de Streamlit ── */
+.stApp { background: #ffffff !important; }
+.block-container { max-width: 760px !important; padding: 0 1.5rem 3rem !important; }
 #MainMenu, footer, header { visibility: hidden; }
-.block-container { padding: 1rem 1.5rem 2rem !important; max-width: 1200px !important; }
 
-/* ══ HEADER HERO ══ */
-.iq-hero {
-    background: linear-gradient(135deg, #6C2BD9 0%, #9B59F5 50%, #C47AF5 100%);
-    border-radius: 24px;
-    padding: 2rem 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(108, 43, 217, 0.35);
+/* ── TOP NAV ── */
+.iq-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem 0 1.2rem;
+    border-bottom: 1.5px solid #F3F4F6;
+    margin-bottom: 2.5rem;
 }
-.iq-hero::before {
-    content: '';
-    position: absolute; top: -40px; right: -40px;
-    width: 200px; height: 200px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 50%;
+.iq-nav-logo {
+    font-size: 1.3rem; font-weight: 800; color: #111827; letter-spacing: -0.02em;
 }
-.iq-hero::after {
-    content: '';
-    position: absolute; bottom: -60px; right: 120px;
-    width: 150px; height: 150px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 50%;
+.iq-nav-logo span { color: #7C3AED; }
+.iq-nav-right { display: flex; align-items: center; gap: 0.8rem; }
+.iq-nav-pill {
+    background: #F5F3FF; color: #7C3AED;
+    font-size: 0.72rem; font-weight: 700;
+    padding: 0.3rem 0.8rem; border-radius: 20px;
+    letter-spacing: 0.03em;
 }
-.iq-hero-left { z-index: 1; }
-.iq-hero-greeting {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.75);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 0.4rem;
-}
-.iq-hero-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 2.4rem;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1.1;
+.iq-nav-pill.green { background: #ECFDF5; color: #059669; }
+
+/* ── PAGE TITLE ── */
+.iq-page-title {
+    font-size: 2rem; font-weight: 800; color: #111827;
+    letter-spacing: -0.03em; line-height: 1.15;
     margin-bottom: 0.5rem;
 }
-.iq-hero-title span { color: #FFD93D; }
-.iq-hero-sub {
-    font-size: 0.95rem;
-    color: rgba(255,255,255,0.8);
-    max-width: 420px;
-    line-height: 1.5;
-}
-.iq-hero-badges { display: flex; gap: 0.6rem; margin-top: 1rem; flex-wrap: wrap; }
-.iq-hero-badge {
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 20px;
-    padding: 0.3rem 0.9rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #fff;
-}
-.iq-hero-emoji {
-    font-size: 5rem;
-    z-index: 1;
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+.iq-page-sub {
+    font-size: 0.95rem; color: #6B7280; line-height: 1.6;
+    margin-bottom: 2rem;
 }
 
-/* ══ NOTICE ══ */
-.iq-notice-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+/* ── SECTION ── */
+.iq-section {
+    margin-bottom: 2rem;
 }
-.iq-notice-card {
-    background: #fff;
-    border-radius: 16px;
+.iq-label {
+    font-size: 0.72rem; font-weight: 700; color: #9CA3AF;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+}
+.iq-h2 {
+    font-size: 1.1rem; font-weight: 700; color: #111827;
+    margin-bottom: 0.9rem;
+}
+
+/* ── NOTICE ── */
+.iq-notice {
+    background: #FAFAFA;
+    border: 1.5px solid #F3F4F6;
+    border-radius: 14px;
     padding: 1rem 1.2rem;
-    display: flex;
-    gap: 0.9rem;
-    align-items: flex-start;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    border: 1px solid rgba(108,43,217,0.08);
+    font-size: 0.83rem; color: #6B7280; line-height: 1.6;
+    margin-bottom: 2rem;
+    display: flex; gap: 0.9rem; align-items: flex-start;
 }
-.iq-notice-icon {
-    width: 38px; height: 38px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem; flex-shrink: 0;
-}
-.iq-notice-icon.purple { background: #EDE9FE; }
-.iq-notice-icon.green  { background: #DCFCE7; }
-.iq-notice-text { font-size: 0.82rem; color: #64748B; line-height: 1.5; }
-.iq-notice-text strong { color: #1A1A2E; display: block; margin-bottom: 0.15rem; font-size: 0.87rem; }
+.iq-notice-ico { font-size: 1.1rem; margin-top: 0.05rem; flex-shrink: 0; }
+.iq-notice b { color: #374151; }
 
-/* ══ SECTION LABEL ══ */
-.iq-section-label {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #9CA3AF;
-    margin-bottom: 0.6rem;
-}
-
-/* ══ PREGUNTA CARD ══ */
-.iq-panel {
-    background: #fff;
-    border-radius: 20px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
-    border: 1px solid rgba(108,43,217,0.08);
-    margin-bottom: 1rem;
-}
-.iq-panel-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #1A1A2E;
-    display: flex; align-items: center; gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-.iq-panel-title .pill {
-    background: #EDE9FE; color: #6C2BD9;
-    font-size: 0.7rem; font-weight: 700;
-    padding: 0.2rem 0.6rem; border-radius: 20px;
-    letter-spacing: 0.04em;
-}
+/* ── PREGUNTA PREVIEW ── */
 .iq-q-preview {
-    background: linear-gradient(135deg, #EDE9FE, #F3E8FF);
-    border: 1px solid rgba(108,43,217,0.15);
-    border-radius: 12px;
+    background: #F5F3FF;
+    border-left: 4px solid #7C3AED;
+    border-radius: 0 12px 12px 0;
     padding: 0.9rem 1.1rem;
-    font-size: 0.9rem;
-    color: #4C1D95;
-    font-style: italic;
-    line-height: 1.5;
-    margin-top: 0.8rem;
+    font-size: 0.92rem; color: #4C1D95;
+    font-style: italic; line-height: 1.55;
+    margin-top: 0.5rem; margin-bottom: 0;
 }
 
-/* ══ WORD COUNT BAR ══ */
-.iq-wc-bar-wrap {
-    margin-top: 0.8rem;
-}
-.iq-wc-label {
+/* ── BARRA PALABRAS ── */
+.iq-wc {
     display: flex; justify-content: space-between;
-    font-size: 0.75rem; color: #94A3B8; margin-bottom: 0.3rem;
+    font-size: 0.75rem; margin-top: 0.5rem;
+    color: #9CA3AF;
 }
-.iq-wc-label span { font-weight: 600; }
 .iq-wc-track {
-    height: 6px; background: #F1F5F9; border-radius: 10px; overflow: hidden;
+    height: 4px; background: #F3F4F6; border-radius: 10px;
+    overflow: hidden; margin-top: 0.3rem;
 }
-.iq-wc-fill {
-    height: 100%; border-radius: 10px;
-    transition: width 0.4s ease;
+.iq-wc-fill { height: 100%; border-radius: 10px; transition: width 0.4s; }
+
+/* ── SEPARADOR ── */
+.iq-sep {
+    border: none; border-top: 1.5px solid #F3F4F6;
+    margin: 2rem 0;
 }
 
-/* ══ ANALYZE BUTTON (via CSS targeting) ══ */
-.stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #6C2BD9, #9B59F5) !important;
-    color: #fff !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 1rem !important;
-    border: none !important;
-    border-radius: 14px !important;
-    padding: 0.8rem 2rem !important;
-    letter-spacing: 0.01em !important;
-    box-shadow: 0 8px 25px rgba(108,43,217,0.35) !important;
-    transition: all 0.2s !important;
-}
-.stButton > button[kind="primary"]:hover { opacity: 0.88 !important; transform: translateY(-1px) !important; }
-.stButton > button[kind="primary"]:disabled {
-    background: #E2E8F0 !important; color: #94A3B8 !important;
-    box-shadow: none !important;
-}
-.stButton > button:not([kind="primary"]) {
-    background: #fff !important; color: #6C2BD9 !important;
-    border: 1.5px solid #DDD6FE !important;
-    border-radius: 12px !important;
-    font-weight: 600 !important; font-size: 0.88rem !important;
-}
-
-/* ══ INPUTS ══ */
-.stSelectbox > div > div {
-    background: #fff !important;
-    border: 1.5px solid #E2E8F0 !important;
-    border-radius: 12px !important;
-    color: #1A1A2E !important;
-    font-size: 0.92rem !important;
-}
-.stSelectbox > div > div:focus-within {
-    border-color: #9B59F5 !important;
-    box-shadow: 0 0 0 3px rgba(155,89,245,0.12) !important;
-}
-.stTextArea > div > div > textarea {
-    background: #fff !important;
-    border: 1.5px solid #E2E8F0 !important;
-    border-radius: 12px !important;
-    color: #1A1A2E !important;
-    font-size: 0.92rem !important;
-    line-height: 1.65 !important;
-    padding: 1rem !important;
-}
-.stTextArea > div > div > textarea:focus {
-    border-color: #9B59F5 !important;
-    box-shadow: 0 0 0 3px rgba(155,89,245,0.12) !important;
-}
-.stTextInput > div > div > input {
-    background: #fff !important;
-    border: 1.5px solid #E2E8F0 !important;
-    border-radius: 12px !important;
-    color: #1A1A2E !important;
-}
-
-/* ══ RESULTADO — GAUGE ══ */
-.iq-results-hero {
-    background: linear-gradient(135deg, #6C2BD9 0%, #9B59F5 100%);
-    border-radius: 24px;
-    padding: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    box-shadow: 0 20px 50px rgba(108,43,217,0.3);
+/* ── RESULTADO HEADER ── */
+.iq-result-header {
+    background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%);
+    border-radius: 20px;
+    padding: 1.8rem 2rem;
     margin-bottom: 1.5rem;
-    position: relative;
-    overflow: hidden;
+    display: flex; align-items: center; gap: 1.5rem;
+    position: relative; overflow: hidden;
+    box-shadow: 0 12px 40px rgba(124,58,237,0.3);
 }
-.iq-results-hero::before {
+.iq-result-header::after {
     content: '';
-    position: absolute; top: -30px; right: -30px;
-    width: 160px; height: 160px;
+    position: absolute; top: -40px; right: -40px;
+    width: 150px; height: 150px;
     background: rgba(255,255,255,0.07); border-radius: 50%;
 }
-.iq-gauge-svg { flex-shrink: 0; }
-.iq-results-info { flex: 1; }
-.iq-results-score-label {
-    font-size: 0.8rem; font-weight: 600;
-    color: rgba(255,255,255,0.7);
-    text-transform: uppercase; letter-spacing: 0.08em;
-    margin-bottom: 0.4rem;
+.iq-gauge-wrap { flex-shrink: 0; }
+.iq-gauge-score {
+    font-size: 3.2rem; font-weight: 800; color: #fff;
+    line-height: 1; text-align: center;
 }
-.iq-results-verdict {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1.8rem; font-weight: 800;
-    color: #fff; line-height: 1.1; margin-bottom: 0.4rem;
+.iq-gauge-den { font-size: 1rem; color: rgba(255,255,255,0.6); font-weight: 500; }
+.iq-gauge-arc { display: block; margin: 0 auto 0.3rem; }
+.iq-result-text { z-index: 1; }
+.iq-result-verdict {
+    font-size: 1.5rem; font-weight: 800; color: #fff;
+    letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 0.4rem;
 }
-.iq-results-desc { font-size: 0.88rem; color: rgba(255,255,255,0.78); line-height: 1.5; }
-.iq-results-tags { display: flex; gap: 0.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
-.iq-results-tag {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 20px; padding: 0.25rem 0.8rem;
-    font-size: 0.75rem; font-weight: 600; color: #fff;
+.iq-result-desc { font-size: 0.88rem; color: rgba(255,255,255,0.8); line-height: 1.55; }
+.iq-result-comps { margin-top: 0.8rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.iq-comp-tag {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px; padding: 0.2rem 0.75rem;
+    font-size: 0.75rem; font-weight: 700; color: #fff;
 }
 
-/* ══ STAR CARDS ══ */
-.iq-star-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
+/* ── STAR GRID ── */
+.iq-star-grid {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 0.75rem;
     margin-bottom: 1.5rem;
 }
 .iq-star-card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 1.4rem 1rem;
+    border-radius: 16px; padding: 1.1rem 0.8rem;
     text-align: center;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-    border: 2px solid transparent;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s;
+    border: 2px solid;
 }
-.iq-star-card:hover { transform: translateY(-3px); }
 .iq-star-card.present {
-    border-color: #10B981;
-    background: linear-gradient(180deg, #ECFDF5 0%, #fff 60%);
+    background: #F0FDF4; border-color: #86EFAC;
 }
 .iq-star-card.absent {
-    border-color: #F87171;
-    background: linear-gradient(180deg, #FFF1F2 0%, #fff 60%);
+    background: #FFF1F2; border-color: #FECDD3;
 }
-.iq-star-card-top {
-    width: 52px; height: 52px; border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem;
-    margin: 0 auto 0.8rem;
+.iq-sc-emoji { font-size: 1.4rem; margin-bottom: 0.4rem; }
+.iq-sc-letter { font-size: 1.5rem; font-weight: 800; line-height: 1; }
+.present .iq-sc-letter { color: #16A34A; }
+.absent  .iq-sc-letter { color: #DC2626; }
+.iq-sc-name { font-size: 0.7rem; color: #9CA3AF; font-weight: 600; margin: 0.2rem 0 0.5rem; }
+.iq-sc-badge {
+    display: inline-block; font-size: 0.65rem; font-weight: 700;
+    padding: 0.2rem 0.6rem; border-radius: 20px;
 }
-.present .iq-star-card-top { background: #DCFCE7; }
-.absent  .iq-star-card-top { background: #FFE4E6; }
-.iq-star-letter {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1.6rem; font-weight: 800; line-height: 1;
-    margin-bottom: 0.15rem;
-}
-.present .iq-star-letter { color: #059669; }
-.absent  .iq-star-letter { color: #DC2626; }
-.iq-star-name { font-size: 0.75rem; color: #94A3B8; font-weight: 500; margin-bottom: 0.6rem; }
-.iq-star-status { font-size: 1.3rem; margin-bottom: 0.4rem; }
-.iq-star-pill {
-    display: inline-block;
-    font-size: 0.65rem; font-weight: 700;
-    padding: 0.2rem 0.65rem; border-radius: 20px;
-    letter-spacing: 0.04em;
-}
-.present .iq-star-pill { background: #DCFCE7; color: #059669; }
-.absent  .iq-star-pill { background: #FFE4E6; color: #DC2626; }
-.iq-star-prob { font-size: 0.65rem; color: #CBD5E1; margin-top: 0.4rem; font-family: monospace; }
+.present .iq-sc-badge { background: #DCFCE7; color: #15803D; }
+.absent  .iq-sc-badge { background: #FFE4E6; color: #BE123C; }
+.iq-sc-prob { font-size: 0.6rem; color: #CBD5E1; margin-top: 0.4rem; font-family: monospace; }
 
-/* ══ FEEDBACK PANEL ══ */
-.iq-feedback-wrap {
-    background: #fff;
-    border-radius: 20px;
-    padding: 1.8rem;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-    border: 1px solid rgba(108,43,217,0.1);
+/* ── FEEDBACK BOX ── */
+.iq-feedback {
+    background: #FAFAFA;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 1.5rem;
     margin-bottom: 1rem;
 }
-.iq-feedback-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 1.2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #F1F5F9;
+.iq-feedback-top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1rem; padding-bottom: 0.9rem;
+    border-bottom: 1.5px solid #F3F4F6;
 }
-.iq-feedback-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1rem; font-weight: 700; color: #1A1A2E;
-    display: flex; align-items: center; gap: 0.5rem;
+.iq-feedback-title { font-size: 0.95rem; font-weight: 700; color: #111827; }
+.iq-mode-pill {
+    font-size: 0.68rem; font-weight: 700;
+    padding: 0.2rem 0.65rem; border-radius: 20px;
 }
-.iq-feedback-mode-badge {
-    font-size: 0.7rem; font-weight: 600;
-    padding: 0.25rem 0.7rem; border-radius: 20px;
-}
-.iq-feedback-mode-badge.ia { background: #EDE9FE; color: #6C2BD9; }
-.iq-feedback-mode-badge.rules { background: #F1F5F9; color: #64748B; }
+.iq-mode-pill.ia    { background: #EDE9FE; color: #7C3AED; }
+.iq-mode-pill.rules { background: #F3F4F6; color: #6B7280; }
 .iq-feedback-body {
-    font-size: 0.9rem; color: #374151; line-height: 1.75;
+    font-size: 0.9rem; color: #374151; line-height: 1.8;
 }
-.iq-feedback-body strong { color: #1A1A2E; }
+.iq-feedback-body strong { color: #111827; }
 
-/* ══ TEMPLATE ══ */
-.iq-template-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem; margin-top: 0.5rem;
+/* ── PLANTILLA ── */
+.iq-tpl {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;
+    margin-top: 0.5rem;
 }
-.iq-template-item {
-    background: #FAFAFA;
-    border: 1px solid #E2E8F0;
-    border-radius: 12px; padding: 1rem;
+.iq-tpl-item {
+    background: #fff; border: 1.5px solid #E5E7EB;
+    border-radius: 12px; padding: 0.9rem;
 }
-.iq-template-letter {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1.1rem; font-weight: 800;
-    margin-bottom: 0.3rem;
-}
-.iq-template-item:nth-child(1) .iq-template-letter { color: #6C2BD9; }
-.iq-template-item:nth-child(2) .iq-template-letter { color: #0EA5E9; }
-.iq-template-item:nth-child(3) .iq-template-letter { color: #F59E0B; }
-.iq-template-item:nth-child(4) .iq-template-letter { color: #10B981; }
-.iq-template-role { font-size: 0.72rem; color: #94A3B8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; }
-.iq-template-text { font-size: 0.8rem; color: #64748B; line-height: 1.5; }
+.iq-tpl-l { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.15rem; }
+.iq-tpl-item:nth-child(1) .iq-tpl-l { color: #7C3AED; }
+.iq-tpl-item:nth-child(2) .iq-tpl-l { color: #0EA5E9; }
+.iq-tpl-item:nth-child(3) .iq-tpl-l { color: #F59E0B; }
+.iq-tpl-item:nth-child(4) .iq-tpl-l { color: #10B981; }
+.iq-tpl-role { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #9CA3AF; margin-bottom: 0.4rem; }
+.iq-tpl-txt { font-size: 0.78rem; color: #6B7280; line-height: 1.55; font-style: italic; }
 
-/* ══ SPINNER ══ */
-.stSpinner > div { border-top-color: #6C2BD9 !important; }
-
-/* ══ EXPANDER ══ */
-.stExpander {
-    background: #fff !important;
-    border: 1px solid rgba(108,43,217,0.1) !important;
-    border-radius: 16px !important;
-}
-
-/* ══ ALERT ══ */
-.stAlert { border-radius: 12px !important; }
-
-/* ══ WARNING ══ */
-[data-baseweb="notification"] {
-    background: #FFFBEB !important;
-    border: 1px solid #FDE68A !important;
-    border-radius: 12px !important;
-    color: #92400E !important;
-}
-
-/* ══ FOOTER ══ */
+/* ── FOOTER ── */
 .iq-footer {
-    text-align: center; color: #CBD5E1; font-size: 0.75rem;
-    padding: 1.5rem 0 0.5rem;
-    border-top: 1px solid #E2E8F0;
-    margin-top: 2rem;
+    text-align: center; font-size: 0.75rem; color: #D1D5DB;
+    padding: 2rem 0 1rem;
+    border-top: 1.5px solid #F3F4F6; margin-top: 2.5rem;
 }
+.iq-footer a { color: #A78BFA; text-decoration: none; }
 
-/* scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #F1F5F9; }
-::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+/* ── STREAMLIT NATIVE OVERRIDES ── */
+div[data-testid="stSelectbox"] > div > div {
+    background: #fff !important;
+    border: 1.5px solid #E5E7EB !important;
+    border-radius: 12px !important;
+    color: #111827 !important;
+    font-size: 0.92rem !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+div[data-testid="stSelectbox"] > div > div:focus-within {
+    border-color: #A78BFA !important;
+    box-shadow: 0 0 0 3px rgba(167,139,250,0.15) !important;
+}
+div[data-testid="stTextArea"] textarea {
+    background: #fff !important;
+    border: 1.5px solid #E5E7EB !important;
+    border-radius: 12px !important;
+    color: #111827 !important;
+    font-size: 0.92rem !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    line-height: 1.65 !important;
+    padding: 0.9rem 1rem !important;
+}
+div[data-testid="stTextArea"] textarea:focus {
+    border-color: #A78BFA !important;
+    box-shadow: 0 0 0 3px rgba(167,139,250,0.15) !important;
+}
+div[data-testid="stTextInput"] input {
+    background: #fff !important;
+    border: 1.5px solid #E5E7EB !important;
+    border-radius: 12px !important;
+    color: #111827 !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+.stButton > button[kind="primary"] {
+    background: #7C3AED !important;
+    color: #fff !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 0.7rem 1.6rem !important;
+    box-shadow: 0 4px 14px rgba(124,58,237,0.3) !important;
+    transition: opacity .2s !important;
+}
+.stButton > button[kind="primary"]:hover { opacity: 0.85 !important; }
+.stButton > button[kind="primary"]:disabled {
+    background: #E5E7EB !important; color: #9CA3AF !important;
+    box-shadow: none !important;
+}
+.stButton > button:not([kind="primary"]) {
+    background: #fff !important;
+    border: 1.5px solid #E5E7EB !important;
+    border-radius: 12px !important;
+    color: #374151 !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+}
+.stButton > button:not([kind="primary"]):hover {
+    border-color: #A78BFA !important;
+    color: #7C3AED !important;
+}
+.stExpander {
+    border: 1.5px solid #E5E7EB !important;
+    border-radius: 14px !important;
+    background: #fff !important;
+}
+div[data-testid="stExpander"] summary {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 0.88rem !important; font-weight: 600 !important;
+    color: #374151 !important;
+}
+.stSpinner > div { border-top-color: #7C3AED !important; }
+div[data-testid="stAlert"] {
+    border-radius: 12px !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 0.85rem !important;
+}
+/* label de st.text_area / selectbox */
+div[data-testid="stWidgetLabel"] label p {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 0.82rem !important; font-weight: 600 !important;
+    color: #374151 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  CONSTANTES
-# ══════════════════════════════════════════════════════════════════════════════
-ETIQUETAS = ['situacion', 'tarea', 'accion', 'resultado']
+ETIQUETAS   = ['situacion', 'tarea', 'accion', 'resultado']
 NOMBRES_STAR = {
     'situacion': ('S', 'Situación', '🌍'),
     'tarea':     ('T', 'Tarea',     '📋'),
@@ -451,191 +333,102 @@ NOMBRES_STAR = {
 }
 MODELS_DIR = Path(__file__).parent / "models"
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  MODELOS
-# ══════════════════════════════════════════════════════════════════════════════
 @st.cache_resource
 def cargar_modelos():
-    config_path = MODELS_DIR / "config_clasificador.json"
-    if not config_path.exists():
+    cfg = MODELS_DIR / "config_clasificador.json"
+    if not cfg.exists():
         return None, None
-    with open(config_path) as f:
+    with open(cfg) as f:
         config = json.load(f)
     umbrales = config.get("umbrales", {
         "situacion": 0.30, "tarea": 0.30, "accion": 0.75, "resultado": 0.70
     })
-    modelos = {}
+    mods = {}
     for et in ETIQUETAS:
         p = MODELS_DIR / f"clasificador_star_{et}.pkl"
         if not p.exists():
             return None, None
-        modelos[et] = joblib.load(p)
-    return modelos, umbrales
+        mods[et] = joblib.load(p)
+    return mods, umbrales
 
+def limpiar(t):
+    t = str(t).lower()
+    t = re.sub(r'[^\w\s]', ' ', t)
+    return re.sub(r'\s+', ' ', t).strip()
 
-def limpiar(texto: str) -> str:
-    texto = str(texto).lower()
-    texto = re.sub(r'[^\w\s]', ' ', texto)
-    return re.sub(r'\s+', ' ', texto).strip()
-
-
-def predecir_star(respuesta: str, modelos: dict, umbrales: dict) -> dict:
-    t = limpiar(respuesta)
+def predecir(resp, mods, umbrales):
+    t = limpiar(resp)
     preds, probs = {}, {}
     for et in ETIQUETAS:
-        prob = modelos[et].predict_proba([t])[0][1]
+        prob = mods[et].predict_proba([t])[0][1]
         preds[et] = int(prob >= umbrales[et])
         probs[et]  = round(float(prob), 3)
     comps = [NOMBRES_STAR[e][0] for e, v in preds.items() if v == 1]
-    return {
-        "predicciones": preds, "probabilidades": probs,
-        "resumen": "-".join(comps) if comps else "Ninguno",
-        "componentes_presentes": comps,
-    }
+    return {"predicciones": preds, "probabilidades": probs,
+            "resumen": "-".join(comps) if comps else "Ninguno",
+            "componentes_presentes": comps}
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  FEEDBACK
-# ══════════════════════════════════════════════════════════════════════════════
-GUIA_STAR = """GUÍA STAR DE INTERVIEWIQ (contexto fijo)
+GUIA_STAR = """GUÍA STAR (contexto fijo):
 - Situación: contexto concreto — dónde, cuándo, con quién.
 - Tarea: responsabilidad específica del candidato.
-- Acción: pasos que tomó personalmente (verbos en 1ª persona).
-- Resultado: qué cambió, idealmente con dato verificable.
-- Duración ideal: 100–250 palabras.
-- Errores comunes: hablar en "nosotros"; olvidar el resultado; respuestas hipotéticas."""
+- Acción: pasos concretos en 1ª persona.
+- Resultado: qué cambió, con dato si es posible.
+- 100–250 palabras ideal. No respuestas hipotéticas."""
 
-SYSTEM_PROMPT = f"""Eres InterviewIQ, un coach de entrevistas por competencias para estudiantes universitarios peruanos.
-Das feedback en español, cálido y directo, máximo 170 palabras.
-
+SYSTEM_PROMPT = f"""Eres InterviewIQ, coach de entrevistas por competencias para universitarios peruanos.
+Feedback en español, cálido y directo, máximo 170 palabras.
 {GUIA_STAR}
-
-REGLAS:
-1. El análisis STAR viene de un modelo entrenado. NO lo contradigas.
-2. No inventes experiencias ni datos del estudiante.
-3. No afirmes probabilidades de ser contratado.
-4. Si la respuesta es muy corta o hipotética, dilo con amabilidad.
-
+REGLAS: No contradigas el análisis STAR. No inventes datos. No prometas resultados.
 FORMATO:
 **Lo que hiciste bien:** 1–2 frases.
-**Lo que falta:** un punto por cada componente AUSENTE.
-**Cómo mejorarla:** una sugerencia concreta.
-"""
+**Lo que falta:** un punto por componente AUSENTE.
+**Cómo mejorarla:** sugerencia concreta."""
 
+def _apikey():
+    try: return st.secrets.get("GEMINI_API_KEY","") or os.environ.get("GEMINI_API_KEY","")
+    except: return os.environ.get("GEMINI_API_KEY","")
 
-def _api_key() -> str:
-    try:
-        return st.secrets.get("GEMINI_API_KEY", "") or os.environ.get("GEMINI_API_KEY", "")
-    except Exception:
-        return os.environ.get("GEMINI_API_KEY", "")
+def _llm():
+    try: return st.secrets.get("GEMINI_MODEL","") or "gemini-2.5-flash"
+    except: return "gemini-2.5-flash"
 
-
-def _modelo_llm() -> str:
-    try:
-        return st.secrets.get("GEMINI_MODEL", "") or "gemini-2.5-flash"
-    except Exception:
-        return "gemini-2.5-flash"
-
-
-def generar_feedback(pregunta: str, respuesta: str, resultado: dict, hipotetica: bool = False) -> tuple[str, str]:
-    api_key = _api_key()
-    if not api_key:
-        return _feedback_reglas(resultado), "rules"
-    preds = resultado["predicciones"]
-    presentes = [NOMBRES_STAR[e][1] for e, v in preds.items() if v == 1]
-    ausentes   = [NOMBRES_STAR[e][1] for e, v in preds.items() if v == 0]
-    msg = f'Pregunta: "{pregunta or "Pregunta conductual libre"}"\n\nRespuesta:\n"""{respuesta}"""\n\nAnálisis STAR:\n- PRESENTES: {", ".join(presentes) if presentes else "ninguno"}\n- AUSENTES: {", ".join(ausentes) if ausentes else "ninguno"}'
-    if hipotetica:
-        msg += "\n\nALERTA: respuesta hipotética. Pídele un caso real."
+def feedback(preg, resp, res, hip=False):
+    key = _apikey()
+    if not key:
+        return _reglas(res), "rules"
+    pr = res["predicciones"]
+    pres = [NOMBRES_STAR[e][1] for e,v in pr.items() if v==1]
+    aus  = [NOMBRES_STAR[e][1] for e,v in pr.items() if v==0]
+    msg = f'Pregunta: "{preg or "libre"}"\nRespuesta:\n"""{resp}"""\nAnálisis STAR:\n- PRESENTES: {", ".join(pres) or "ninguno"}\n- AUSENTES: {", ".join(aus) or "ninguno"}'
+    if hip: msg += "\nALERTA: hipotética, pídele caso real."
     try:
         import requests
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{_modelo_llm()}:generateContent"
-        payload = {
-            "system_instruction": {"parts": [{"text": SYSTEM_PROMPT}]},
-            "contents": [{"role": "user", "parts": [{"text": msg}]}],
-            "generationConfig": {"temperature": 0.4, "maxOutputTokens": 800},
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{_llm()}:generateContent"
+        body = {
+            "system_instruction": {"parts":[{"text":SYSTEM_PROMPT}]},
+            "contents":[{"role":"user","parts":[{"text":msg}]}],
+            "generationConfig":{"temperature":0.4,"maxOutputTokens":800},
         }
-        r = requests.post(url, params={"key": api_key}, json=payload, timeout=25)
+        r = requests.post(url, params={"key":key}, json=body, timeout=25)
         r.raise_for_status()
-        texto = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-        if not texto:
-            raise ValueError("vacío")
-        return texto, "ia"
-    except Exception:
-        return _feedback_reglas(resultado), "rules"
+        txt = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+        if not txt: raise ValueError
+        return txt, "ia"
+    except:
+        return _reglas(res), "rules"
 
+def _reglas(res):
+    pr = res["predicciones"]
+    aus  = [NOMBRES_STAR[e][1] for e,v in pr.items() if v==0]
+    pres = [NOMBRES_STAR[e][1] for e,v in pr.items() if v==1]
+    if len(pres)==4: return "🌟 **¡Respuesta STAR completa!** Tu respuesta incluye los 4 componentes. Cuantifica tus resultados con números o porcentajes para potenciarla."
+    if len(pres)==0: return "**Reorganiza tu respuesta con la estructura STAR:**\n\n**S — Situación:** ¿Cuál era el contexto?\n**T — Tarea:** ¿Cuál era tu rol?\n**A — Acción:** ¿Qué hiciste tú?\n**R — Resultado:** ¿Qué lograste?"
+    sug = {"Situación":"Empieza con el contexto: empresa, equipo, momento.","Tarea":"Explica tu responsabilidad específica.","Acción":"Detalla los pasos que TÚ tomaste en primera persona.","Resultado":"Cierra con el impacto de tus acciones, con datos si puedes."}
+    return f"**Detectamos:** {', '.join(pres)}.\n\n" + "".join(f"→ **{a}:** {sug.get(a,'')}\n\n" for a in aus)
 
-def _feedback_reglas(resultado: dict) -> str:
-    preds = resultado["predicciones"]
-    ausentes  = [NOMBRES_STAR[e][1] for e, v in preds.items() if v == 0]
-    presentes = [NOMBRES_STAR[e][1] for e, v in preds.items() if v == 1]
-    total = len(presentes)
-    if total == 4:
-        return "🌟 **¡Respuesta STAR completa!** Tu respuesta incluye los 4 componentes. Para seguir mejorando, cuantifica tus resultados con números, porcentajes o plazos concretos."
-    elif total == 0:
-        return "**Tu respuesta necesita estructura STAR.**\n\n**S — Situación:** ¿Cuál era el contexto?\n\n**T — Tarea:** ¿Cuál era tu rol?\n\n**A — Acción:** ¿Qué hiciste tú?\n\n**R — Resultado:** ¿Qué lograste?"
-    else:
-        sugerencias = {
-            "Situación": "Empieza describiendo el contexto: en qué empresa, equipo o momento ocurrió.",
-            "Tarea": "Explica cuál era TU responsabilidad específica.",
-            "Acción": "Detalla los pasos concretos que TÚ tomaste — usa verbos de acción en primera persona.",
-            "Resultado": "Cierra con el impacto de tus acciones, idealmente con números o métricas.",
-        }
-        fb = f"**Detectamos:** {', '.join(presentes)}.\n\n"
-        for a in ausentes:
-            fb += f"→ **{a}:** {sugerencias.get(a, '')}\n\n"
-        return fb
+PATRON_HIP = re.compile(r"\b(si (yo )?(tuviera|estuviera|fuera)|(yo )?(har[ií]a|intentar[ií]a|buscar[ií]a|hablar[ií]a|tratar[ií]a|propondr[ií]a)|lo que har[ií]a|deber[ií]a)\b", re.I)
+def es_hip(t): return len(PATRON_HIP.findall(t)) >= 2
 
-
-PATRON_HIP = re.compile(
-    r"\b(si (yo )?(tuviera|estuviera|fuera)|"
-    r"(yo )?(har[ií]a|intentar[ií]a|buscar[ií]a|hablar[ií]a|tratar[ií]a|propondr[ií]a)|"
-    r"lo que har[ií]a|deber[ií]a)\b", re.IGNORECASE)
-
-def es_hipotetica(texto: str) -> bool:
-    return len(PATRON_HIP.findall(texto)) >= 2
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  GAUGE SVG (estilo dashboard con arco coloreado)
-# ══════════════════════════════════════════════════════════════════════════════
-def render_gauge(total: int) -> str:
-    pct = total / 4
-    r = 54
-    circ = 2 * 3.14159 * r
-    # Usamos solo 270° del círculo (3/4)
-    arc = circ * 0.75
-    dash = pct * arc
-    colors = {0: "#F87171", 1: "#F87171", 2: "#FCD34D", 3: "#FCD34D", 4: "#34D399"}
-    color = colors[total]
-    # Rotate so arc starts bottom-left → bottom-right
-    return f"""
-    <div style="display:flex;align-items:center;justify-content:center;position:relative;width:140px;height:140px;margin:0 auto;">
-      <svg width="140" height="140" viewBox="0 0 140 140">
-        <circle cx="70" cy="70" r="{r}" fill="none"
-            stroke="rgba(255,255,255,0.15)" stroke-width="10"
-            stroke-dasharray="{arc:.1f} {circ:.1f}"
-            stroke-linecap="round"
-            transform="rotate(135 70 70)"/>
-        <circle cx="70" cy="70" r="{r}" fill="none"
-            stroke="{color}" stroke-width="10"
-            stroke-dasharray="{dash:.1f} {circ:.1f}"
-            stroke-linecap="round"
-            transform="rotate(135 70 70)"
-            style="transition:stroke-dasharray 0.8s ease;filter:drop-shadow(0 0 8px {color}88);"/>
-      </svg>
-      <div style="position:absolute;text-align:center;">
-        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:2.4rem;font-weight:800;color:#fff;line-height:1;">{total}</div>
-        <div style="font-size:0.65rem;color:rgba(255,255,255,0.6);font-weight:600;letter-spacing:0.05em;">DE 4</div>
-      </div>
-    </div>
-    """
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  PREGUNTAS
-# ══════════════════════════════════════════════════════════════════════════════
 PREGUNTAS = [
     "Cuéntame de una vez que tuviste que trabajar bajo presión y cómo lo manejaste.",
     "Describe una situación en la que tuviste que resolver un conflicto en tu equipo.",
@@ -644,248 +437,232 @@ PREGUNTAS = [
     "Describe una situación en la que tuviste que convencer a alguien de tu idea.",
 ]
 
+def gauge_svg(total):
+    pct = total / 4
+    r = 48; circ = 2*3.14159*r
+    arc = circ * 0.75; dash = pct * arc
+    col = {0:"#F87171",1:"#F87171",2:"#FCD34D",3:"#FCD34D",4:"#4ADE80"}[total]
+    return f"""<svg width="120" height="120" viewBox="0 0 120 120" class="iq-gauge-arc">
+  <circle cx="60" cy="60" r="{r}" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="9"
+      stroke-dasharray="{arc:.1f} {circ:.1f}" stroke-linecap="round" transform="rotate(135 60 60)"/>
+  <circle cx="60" cy="60" r="{r}" fill="none" stroke="{col}" stroke-width="9"
+      stroke-dasharray="{dash:.1f} {circ:.1f}" stroke-linecap="round" transform="rotate(135 60 60)"
+      style="filter:drop-shadow(0 0 6px {col});transition:stroke-dasharray .8s ease;"/>
+  <text x="60" y="55" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif"
+      font-size="28" font-weight="800" fill="white">{total}</text>
+  <text x="60" y="72" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif"
+      font-size="11" fill="rgba(255,255,255,0.6)" font-weight="600">de 4</text>
+</svg>"""
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  MAIN
+#  UI
 # ══════════════════════════════════════════════════════════════════════════════
 def main():
-    # ── HERO ──────────────────────────────────────────────────────────────────
-    st.markdown("""
-    <div class="iq-hero">
-      <div class="iq-hero-left">
-        <div class="iq-hero-greeting">AD5018 IA para Negocios · UTEC 2026-2</div>
-        <div class="iq-hero-title">Interview<span>IQ</span></div>
-        <div class="iq-hero-sub">Entrena tus respuestas de entrevista con el método STAR y recibe feedback personalizado al instante.</div>
-        <div class="iq-hero-badges">
-          <span class="iq-hero-badge">🤖 IA + Reglas STAR</span>
-          <span class="iq-hero-badge">⚡ Feedback al instante</span>
-          <span class="iq-hero-badge">🎯 F1 = 0.830</span>
-        </div>
-      </div>
-      <div class="iq-hero-emoji">🎙️</div>
-    </div>
-    """, unsafe_allow_html=True)
+    mods, umbrales = cargar_modelos()
 
-    # ── NOTICES ───────────────────────────────────────────────────────────────
+    # NAV
     st.markdown("""
-    <div class="iq-notice-row">
-      <div class="iq-notice-card">
-        <div class="iq-notice-icon purple">🤖</div>
-        <div class="iq-notice-text">
-          <strong>Herramienta con Inteligencia Artificial</strong>
-          Un modelo entrenado por el equipo detecta componentes STAR y un LLM genera feedback. Es una herramienta de práctica — puede equivocarse.
-        </div>
+    <div class="iq-nav">
+      <div class="iq-nav-logo">Interview<span>IQ</span></div>
+      <div class="iq-nav-right">
+        <span class="iq-nav-pill">UTEC · AD5018</span>
+        <span class="iq-nav-pill green">F1 = 0.830 ✓</span>
       </div>
-      <div class="iq-notice-card">
-        <div class="iq-notice-icon green">🔒</div>
-        <div class="iq-notice-text">
-          <strong>Privacidad (Ley N.° 29733)</strong>
-          Tu respuesta se usa solo para darte feedback en esta sesión. No se guarda ni se asocia a tu identidad. Evita datos personales.
-        </div>
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
+    </div>""", unsafe_allow_html=True)
 
-    # Cargar modelos
-    modelos, umbrales = cargar_modelos()
-    if modelos is None:
+    if mods is None:
         st.error("⚠️ Modelos no encontrados. Verifica que `models/` contiene los archivos `.pkl` y `config_clasificador.json`.")
         st.stop()
 
-    # ── LAYOUT DOS COLUMNAS ───────────────────────────────────────────────────
-    col_izq, col_der = st.columns([1, 1], gap="large")
+    # TÍTULO
+    st.markdown("""
+    <div class="iq-page-title">Entrena tu respuesta de entrevista</div>
+    <div class="iq-page-sub">
+        Escribe una respuesta real, detectamos los componentes <strong>STAR</strong>
+        y recibes feedback personalizado al instante.
+    </div>""", unsafe_allow_html=True)
 
-    with col_izq:
-        # ── Paso 1 ────────────────────────────────────────────────────────────
-        st.markdown('<div class="iq-section-label">Paso 1 — Pregunta</div>', unsafe_allow_html=True)
-        st.markdown('<div class="iq-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="iq-panel-title">Elige tu pregunta de entrevista <span class="pill">BANCO</span></div>', unsafe_allow_html=True)
+    # NOTICE
+    st.markdown("""
+    <div class="iq-notice">
+      <span class="iq-notice-ico">🤖</span>
+      <span>Esta herramienta usa IA para detectar componentes STAR y generar feedback. Es una práctica — puede equivocarse y no predice resultados en entrevistas reales. <b>Privacidad (Ley N.° 29733):</b> tu respuesta se usa solo en esta sesión; evita datos personales.</span>
+    </div>""", unsafe_allow_html=True)
 
-        pregunta_sel = st.selectbox(
-            "Pregunta:",
-            options=[""] + PREGUNTAS + ["✏️ Escribir mi propia pregunta..."],
-            index=0,
-            label_visibility="collapsed",
-        )
+    # ── PASO 1 ────────────────────────────────────────────────────────────────
+    st.markdown('<div class="iq-label">Paso 1 · Pregunta de entrevista</div>', unsafe_allow_html=True)
 
-        pregunta_custom = ""
-        if pregunta_sel == "✏️ Escribir mi propia pregunta...":
-            pregunta_custom = st.text_input("Tu pregunta:", placeholder="Escribe tu pregunta de entrevista...", label_visibility="collapsed")
-            pregunta_final = pregunta_custom
+    pregunta_sel = st.selectbox(
+        "Elige una pregunta del banco o escribe la tuya:",
+        options=[""] + PREGUNTAS + ["✏️ Escribe tu propia pregunta..."],
+        index=0,
+    )
+    pregunta_custom = ""
+    if pregunta_sel == "✏️ Escribe tu propia pregunta...":
+        pregunta_custom = st.text_input("Tu pregunta:", placeholder="Escribe aquí...")
+        pregunta_final = pregunta_custom
+    else:
+        pregunta_final = pregunta_sel
+
+    if pregunta_final:
+        st.markdown(f'<div class="iq-q-preview">💬 &nbsp;"{pregunta_final}"</div>', unsafe_allow_html=True)
+
+    st.markdown('<hr class="iq-sep">', unsafe_allow_html=True)
+
+    # ── PASO 2 ────────────────────────────────────────────────────────────────
+    st.markdown('<div class="iq-label">Paso 2 · Tu respuesta</div>', unsafe_allow_html=True)
+
+    respuesta = st.text_area(
+        "Escribe una experiencia real (recuerda: Situación → Tarea → Acción → Resultado):",
+        placeholder="Ejemplo: En mi práctica en [empresa], tuve que [tarea]. Lo que hice fue [acciones]. Como resultado, [logro con datos].",
+        height=175,
+    )
+
+    palabras = len(respuesta.split()) if respuesta.strip() else 0
+    if respuesta.strip():
+        pct_w = min(palabras / 150, 1.0)
+        if palabras >= 50:
+            fc, lc, lbl = "#4ADE80", "#16A34A", f"{palabras} palabras ✓ buena longitud"
+        elif palabras >= 20:
+            fc, lc, lbl = "#FCD34D", "#D97706", f"{palabras} palabras — intenta llegar a 50"
         else:
-            pregunta_final = pregunta_sel
+            fc, lc, lbl = "#F87171", "#DC2626", f"{palabras} palabras — muy corta"
+        st.markdown(f"""
+        <div class="iq-wc">
+            <span>Longitud</span>
+            <span style="color:{lc};font-weight:600;">{lbl}</span>
+        </div>
+        <div class="iq-wc-track">
+            <div class="iq-wc-fill" style="width:{int(pct_w*100)}%;background:{fc};"></div>
+        </div>""", unsafe_allow_html=True)
 
-        if pregunta_final:
-            st.markdown(f'<div class="iq-q-preview">💬 &nbsp;"{pregunta_final}"</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<hr class="iq-sep">', unsafe_allow_html=True)
 
-    with col_der:
-        # ── Paso 2 ────────────────────────────────────────────────────────────
-        st.markdown('<div class="iq-section-label">Paso 2 — Tu respuesta</div>', unsafe_allow_html=True)
-        st.markdown('<div class="iq-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="iq-panel-title">Escribe tu respuesta <span class="pill">STAR</span></div>', unsafe_allow_html=True)
-
-        respuesta = st.text_area(
-            "Respuesta:",
-            placeholder="Cuenta una experiencia real usando el método STAR:\n\nSituación → Tarea → Acción → Resultado",
-            height=160,
-            label_visibility="collapsed",
-        )
-
-        palabras = len(respuesta.split()) if respuesta.strip() else 0
-        if respuesta.strip():
-            pct = min(palabras / 150, 1)
-            if palabras >= 50:
-                fill_color, label_color, label = "#10B981", "#059669", f"{palabras} palabras ✓"
-            elif palabras >= 20:
-                fill_color, label_color, label = "#F59E0B", "#D97706", f"{palabras} palabras — intenta llegar a 50"
-            else:
-                fill_color, label_color, label = "#F87171", "#DC2626", f"{palabras} palabras — muy corta"
-            pct_pct = int(pct * 100)
-            st.markdown(f"""
-            <div class="iq-wc-bar-wrap">
-              <div class="iq-wc-label">
-                <span>Longitud de respuesta</span>
-                <span style="color:{label_color}">{label}</span>
-              </div>
-              <div class="iq-wc-track">
-                <div class="iq-wc-fill" style="width:{pct_pct}%;background:{fill_color};"></div>
-              </div>
-            </div>
-            """, unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    # ── Botón ─────────────────────────────────────────────────────────────────
-    _, btn_col, _ = st.columns([1, 2, 1])
-    with btn_col:
-        analizar = st.button(
-            "🎯  Analizar mi respuesta",
-            type="primary",
-            use_container_width=True,
-            disabled=(not respuesta.strip()),
-        )
+    # ── BOTÓN ─────────────────────────────────────────────────────────────────
+    analizar = st.button(
+        "Analizar mi respuesta →",
+        type="primary",
+        use_container_width=True,
+        disabled=not respuesta.strip(),
+    )
 
     # ── RESULTADOS ────────────────────────────────────────────────────────────
     if analizar and respuesta.strip():
         if palabras < 20:
-            st.warning("Tu respuesta tiene menos de 20 palabras. El análisis puede no ser confiable — cuenta un caso real con más detalle.")
+            st.warning("Tu respuesta tiene menos de 20 palabras — el análisis puede ser impreciso. Cuenta el caso con más detalle.")
+        if es_hip(respuesta):
+            st.warning('Tu respuesta parece hipotética ("yo haría..."). En competencias te piden un caso real que hayas vivido.')
 
-        hipotetica = es_hipotetica(respuesta)
-        if hipotetica:
-            st.warning('Tu respuesta parece hipotética ("yo haría..."). En una entrevista por competencias te piden un caso que sí viviste.')
+        with st.spinner("Analizando componentes STAR..."):
+            res = predecir(respuesta, mods, umbrales)
 
-        with st.spinner("Analizando con IA..."):
-            resultado = predecir_star(respuesta, modelos, umbrales)
+        total_p = sum(res["predicciones"].values())
 
-        total_p = sum(resultado["predicciones"].values())
         verdicts = {
-            4: ("🌟 Respuesta STAR Completa", "Excelente — tu respuesta incluye los 4 componentes STAR. ¡Estás listo para la entrevista!"),
-            3: ("⚡ Casi perfecto", "Muy buena respuesta — falta un componente para llegar al 100%."),
-            2: ("📈 Buen inicio", "Tienes 2 de 4 componentes. Agrega los que faltan para una respuesta sólida."),
-            1: ("💡 Necesita más estructura", "Solo 1 componente detectado. La respuesta necesita más desarrollo."),
-            0: ("🔧 Sin estructura STAR", "No se detectaron componentes STAR. Reorganiza tu respuesta con la plantilla."),
+            4: ("🌟 Respuesta STAR Completa", "Excelente — tienes los 4 componentes. ¡Listo para la entrevista!"),
+            3: ("⚡ Casi perfecto — falta 1", "Muy buena estructura. Solo un componente por agregar."),
+            2: ("📈 Buen inicio — faltan 2", "Tienes la mitad. Agrega los componentes que faltan para una respuesta sólida."),
+            1: ("💡 Falta desarrollar más", "Solo 1 componente detectado. Expande tu respuesta con más detalle."),
+            0: ("🔧 Sin estructura STAR", "No se detectaron componentes. Reorganiza usando la plantilla de abajo."),
         }
         v_title, v_desc = verdicts[total_p]
-        tags = [f"{NOMBRES_STAR[e][0]} ✓" for e, v in resultado["predicciones"].items() if v == 1]
-        tags_html = "".join(f'<span class="iq-results-tag">{t}</span>' for t in tags) if tags else '<span class="iq-results-tag" style="background:rgba(248,113,113,0.2)">Sin componentes</span>'
+        tags_html = "".join(
+            f'<span class="iq-comp-tag">{NOMBRES_STAR[e][0]} — {NOMBRES_STAR[e][1]}</span>'
+            for e, v in res["predicciones"].items() if v == 1
+        )
 
+        # Resultado hero
         st.markdown(f"""
-        <div class="iq-results-hero">
-          {render_gauge(total_p)}
-          <div class="iq-results-info">
-            <div class="iq-results-score-label">Puntuación STAR</div>
-            <div class="iq-results-verdict">{v_title}</div>
-            <div class="iq-results-desc">{v_desc}</div>
-            <div class="iq-results-tags">{tags_html}</div>
+        <div class="iq-result-header">
+          <div class="iq-gauge-wrap">{gauge_svg(total_p)}</div>
+          <div class="iq-result-text">
+            <div class="iq-result-verdict">{v_title}</div>
+            <div class="iq-result-desc">{v_desc}</div>
+            <div class="iq-result-comps">{tags_html if tags_html else '<span class="iq-comp-tag" style="background:rgba(248,113,113,0.25)">Sin componentes detectados</span>'}</div>
           </div>
-        </div>
-        """, unsafe_allow_html=True)
+        </div>""", unsafe_allow_html=True)
 
         # Cards STAR
-        cards_html = '<div class="iq-star-row">'
+        cards = ""
         for et in ETIQUETAS:
             letra, nombre, emoji = NOMBRES_STAR[et]
-            presente = resultado["predicciones"][et] == 1
-            prob = resultado["probabilidades"][et]
+            pres = res["predicciones"][et] == 1
+            prob = res["probabilidades"][et]
             u = umbrales[et]
-            cls = "present" if presente else "absent"
-            status = "✅" if presente else "❌"
-            pill_txt = "Presente" if presente else "Ausente"
-            cards_html += f"""
+            cls = "present" if pres else "absent"
+            pill = "Presente" if pres else "Ausente"
+            icon = "✅" if pres else "❌"
+            cards += f"""
             <div class="iq-star-card {cls}">
-              <div class="iq-star-card-top">{emoji}</div>
-              <div class="iq-star-letter">{letra}</div>
-              <div class="iq-star-name">{nombre}</div>
-              <div class="iq-star-status">{status}</div>
-              <span class="iq-star-pill">{pill_txt}</span>
-              <div class="iq-star-prob">p={prob:.2f} · u={u}</div>
+              <div class="iq-sc-emoji">{emoji}</div>
+              <div class="iq-sc-letter">{letra}</div>
+              <div class="iq-sc-name">{nombre}</div>
+              <div style="font-size:1.1rem;margin-bottom:0.4rem;">{icon}</div>
+              <span class="iq-sc-badge">{pill}</span>
+              <div class="iq-sc-prob">p={prob:.2f} · u={u}</div>
             </div>"""
-        cards_html += '</div>'
-        st.markdown(cards_html, unsafe_allow_html=True)
+        st.markdown(f'<div class="iq-star-grid">{cards}</div>', unsafe_allow_html=True)
 
-        # Feedback
-        with st.spinner("Generando feedback personalizado..."):
-            feedback, modo = generar_feedback(pregunta_final, respuesta, resultado, hipotetica)
+        st.markdown('<hr class="iq-sep">', unsafe_allow_html=True)
+        st.markdown('<div class="iq-label">Feedback personalizado</div>', unsafe_allow_html=True)
+
+        with st.spinner("Generando feedback..."):
+            fb_txt, modo = feedback(pregunta_final, respuesta, res, es_hip(respuesta))
 
         modo_html = (
-            '<span class="iq-feedback-mode-badge ia">🤖 Google Gemini</span>'
+            '<span class="iq-mode-pill ia">🤖 Gemini</span>'
             if modo == "ia" else
-            '<span class="iq-feedback-mode-badge rules">📋 Reglas estructuradas</span>'
+            '<span class="iq-mode-pill rules">📋 Reglas</span>'
         )
         st.markdown(f"""
-        <div class="iq-feedback-wrap">
-          <div class="iq-feedback-header">
-            <div class="iq-feedback-title">💬 Feedback personalizado</div>
+        <div class="iq-feedback">
+          <div class="iq-feedback-top">
+            <div class="iq-feedback-title">Análisis de tu respuesta</div>
             {modo_html}
           </div>
           <div class="iq-feedback-body">
-            {feedback.replace(chr(10), '<br>')}
+            {fb_txt.replace(chr(10), '<br>')}
           </div>
-        </div>
-        """, unsafe_allow_html=True)
+        </div>""", unsafe_allow_html=True)
 
-        # Plantilla STAR
-        ausentes_et = [et for et, v in resultado["predicciones"].items() if v == 0]
-        if ausentes_et:
-            with st.expander("📐 Ver plantilla STAR para mejorar tu respuesta"):
+        # Plantilla
+        aus_et = [et for et, v in res["predicciones"].items() if v == 0]
+        if aus_et:
+            with st.expander("Ver plantilla STAR"):
                 st.markdown("""
-                <div class="iq-template-grid">
-                  <div class="iq-template-item">
-                    <div class="iq-template-letter">S</div>
-                    <div class="iq-template-role">Situación</div>
-                    <div class="iq-template-text">"En [empresa/equipo/momento], nos enfrentamos a [contexto específico]..."</div>
+                <div class="iq-tpl">
+                  <div class="iq-tpl-item">
+                    <div class="iq-tpl-l">S</div>
+                    <div class="iq-tpl-role">Situación</div>
+                    <div class="iq-tpl-txt">"En [empresa/equipo], durante [momento], nos enfrentamos a [contexto]..."</div>
                   </div>
-                  <div class="iq-template-item">
-                    <div class="iq-template-letter">T</div>
-                    <div class="iq-template-role">Tarea</div>
-                    <div class="iq-template-text">"Mi responsabilidad era [objetivo/rol específico tuyo]..."</div>
+                  <div class="iq-tpl-item">
+                    <div class="iq-tpl-l">T</div>
+                    <div class="iq-tpl-role">Tarea</div>
+                    <div class="iq-tpl-txt">"Mi responsabilidad era [objetivo específico tuyo]..."</div>
                   </div>
-                  <div class="iq-template-item">
-                    <div class="iq-template-letter">A</div>
-                    <div class="iq-template-role">Acción</div>
-                    <div class="iq-template-text">"Lo que hice fue [pasos concretos en primera persona]..."</div>
+                  <div class="iq-tpl-item">
+                    <div class="iq-tpl-l">A</div>
+                    <div class="iq-tpl-role">Acción</div>
+                    <div class="iq-tpl-txt">"Lo que hice fue [pasos concretos en primera persona]..."</div>
                   </div>
-                  <div class="iq-template-item">
-                    <div class="iq-template-letter">R</div>
-                    <div class="iq-template-role">Resultado</div>
-                    <div class="iq-template-text">"Como resultado, [logro + datos: %, tiempo, reconocimiento]..."</div>
+                  <div class="iq-tpl-item">
+                    <div class="iq-tpl-l">R</div>
+                    <div class="iq-tpl-role">Resultado</div>
+                    <div class="iq-tpl-txt">"Como resultado, [logro + dato: %, tiempo, reconocimiento]..."</div>
                   </div>
-                </div>
-                """, unsafe_allow_html=True)
+                </div>""", unsafe_allow_html=True)
 
-        _, r_col, _ = st.columns([1, 2, 1])
-        with r_col:
-            if st.button("🔄  Analizar otra respuesta", use_container_width=True):
-                st.rerun()
+        st.markdown('<hr class="iq-sep">', unsafe_allow_html=True)
+        if st.button("← Analizar otra respuesta", use_container_width=True):
+            st.rerun()
 
-    # ── FOOTER ────────────────────────────────────────────────────────────────
+    # FOOTER
     st.markdown("""
     <div class="iq-footer">
-        InterviewIQ · AD5018 IA para Negocios · UTEC 2026-2 ·
-        <a href="https://github.com/itslueli/InterviewIQ" style="color:#9B59F5;text-decoration:none;">GitHub</a>
-    </div>
-    """, unsafe_allow_html=True)
-
+      InterviewIQ · AD5018 IA para Negocios · UTEC 2026-2 ·
+      <a href="https://github.com/itslueli/InterviewIQ">GitHub</a>
+    </div>""", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
