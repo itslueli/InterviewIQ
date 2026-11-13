@@ -1,6 +1,6 @@
 """
 InterviewIQ — MVP Streamlit
-Componente A2: Clasificador STAR + Componente G2: Feedback RAG
+Componente A2: Clasificador STAR + Capa de lenguaje G1: feedback con LLM (Gemini) y contexto fijo
 AD5018 IA para Negocios — UTEC 2026-2
 """
 
@@ -141,61 +141,97 @@ def predecir_star(respuesta_texto: str, modelos: dict, umbrales: dict) -> dict:
     }
 
 
-# ─── Feedback con OpenAI (G2) — opcional ─────────────────────────────────────
-def generar_feedback_rag(respuesta: str, resultado_star: dict, api_key: str) -> str:
+# ─── Capa de lenguaje (G1): LLM con contexto fijo ────────────────────────────
+# La key del equipo vive en los Secrets de Streamlit Cloud (GEMINI_API_KEY),
+# nunca en el repositorio. El evaluador no necesita ingresar ninguna clave.
+
+GUIA_STAR = """GUÍA STAR DE INTERVIEWIQ (contexto fijo del equipo)
+- Situación: contexto concreto — dónde, cuándo, con quién (curso, práctica, trabajo, equipo).
+- Tarea: la responsabilidad o el objetivo específico del candidato en esa situación.
+- Acción: los pasos que el candidato tomó personalmente (verbos en primera persona: "organicé", "propuse").
+- Resultado: qué cambió gracias a la acción, idealmente con un dato verificable (nota, tiempo, %, reconocimiento) y qué aprendió.
+- Una buena respuesta dura entre 1 y 2 minutos hablada (unas 100–250 palabras).
+- Errores comunes: hablar en "nosotros" sin decir qué hizo uno; contar la situación y olvidar el resultado; respuestas hipotéticas ("yo haría...") en vez de un caso real."""
+
+SYSTEM_PROMPT = f"""Eres InterviewIQ, un coach de entrevistas por competencias para estudiantes universitarios peruanos de últimos ciclos.
+Das feedback en español, cálido y directo, de máximo 170 palabras.
+
+{GUIA_STAR}
+
+REGLAS QUE NO PUEDES ROMPER:
+1. El análisis STAR que recibes viene de un modelo entrenado por el equipo. NO lo contradigas: nunca digas que un componente marcado AUSENTE está presente, ni al revés.
+2. No inventes experiencias, datos ni logros del estudiante. Si sugieres un dato, dilo como ejemplo entre corchetes, p. ej. [porcentaje de mejora].
+3. No afirmes probabilidades de ser contratado ni prometas resultados en entrevistas reales.
+4. Si la respuesta no tiene relación con una entrevista o es demasiado corta, dilo con amabilidad y pide un ejemplo real.
+
+FORMATO:
+**Lo que hiciste bien:** 1–2 frases.
+**Lo que falta:** un punto por cada componente AUSENTE, explicando por qué importa.
+**Cómo mejorarla:** una sugerencia concreta (puede ser una frase modelo que el estudiante complete).
+"""
+
+
+def _obtener_api_key() -> str:
+    try:
+        return st.secrets.get("GEMINI_API_KEY", "") or os.environ.get("GEMINI_API_KEY", "")
+    except Exception:
+        return os.environ.get("GEMINI_API_KEY", "")
+
+
+def _obtener_modelo_llm() -> str:
+    try:
+        return st.secrets.get("GEMINI_MODEL", "") or "gemini-2.5-flash"
+    except Exception:
+        return "gemini-2.5-flash"
+
+
+def generar_feedback(pregunta: str, respuesta: str, resultado_star: dict, hipotetica: bool = False) -> tuple[str, str]:
     """
-    Genera feedback personalizado usando GPT-4o-mini.
-    Si no hay API key, retorna feedback basado en reglas.
+    Devuelve (feedback, modo). modo = "ia" si respondió el LLM, "reglas" si se usó el respaldo.
+    El LLM siempre recibe la salida del clasificador STAR (patrón 1: modelo → lenguaje).
     """
+    api_key = _obtener_api_key()
     if not api_key:
-        return _feedback_por_reglas(resultado_star)
+        return _feedback_por_reglas(resultado_star), "reglas"
+
+    predicciones = resultado_star["predicciones"]
+    presentes = [NOMBRES_STAR[e][1] for e, v in predicciones.items() if v == 1]
+    ausentes = [NOMBRES_STAR[e][1] for e, v in predicciones.items() if v == 0]
+
+    mensaje = f"""Pregunta de entrevista: "{pregunta or 'Pregunta conductual libre'}"
+
+Respuesta del estudiante:
+\"\"\"{respuesta}\"\"\"
+
+Análisis STAR del modelo (no lo contradigas):
+- PRESENTES: {', '.join(presentes) if presentes else 'ninguno'}
+- AUSENTES: {', '.join(ausentes) if ausentes else 'ninguno (respuesta completa)'}"""
+    if hipotetica:
+        mensaje += (
+            "\n\nALERTA: la respuesta parece hipotética (habla de lo que el estudiante 'haría'), "
+            "no de un caso real. Explícale primero que en una entrevista por competencias debe contar "
+            "una experiencia que sí vivió, y pídele un ejemplo concreto."
+        )
 
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=api_key)
-
-        componentes = resultado_star["predicciones"]
-        ausentes = [
-            NOMBRES_STAR[e][1]
-            for e, v in componentes.items() if v == 0
-        ]
-        presentes = [
-            NOMBRES_STAR[e][1]
-            for e, v in componentes.items() if v == 1
-        ]
-
-        prompt_sistema = """Eres un coach experto en entrevistas de trabajo para estudiantes universitarios.
-Tu rol es dar feedback constructivo, específico y motivador sobre respuestas a preguntas de entrevista.
-Siempre usas el método STAR (Situación, Tarea, Acción, Resultado) como marco de referencia.
-Sé conciso (máximo 200 palabras), directo y da ejemplos concretos de cómo mejorar."""
-
-        prompt_usuario = f"""El estudiante respondió esta pregunta de entrevista:
-
-"{respuesta}"
-
-Análisis automático STAR:
-- Componentes PRESENTES: {', '.join(presentes) if presentes else 'Ninguno'}
-- Componentes AUSENTES: {', '.join(ausentes) if ausentes else 'Ninguno (¡respuesta completa!)'}
-
-Por favor:
-1. Reconoce brevemente lo que hizo bien
-2. Explica qué componentes STAR faltan y POR QUÉ son importantes
-3. Da una sugerencia CONCRETA de cómo mejorar la respuesta
-4. Termina con una frase motivadora"""
-
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": prompt_sistema},
-                {"role": "user", "content": prompt_usuario},
-            ],
-            max_tokens=400,
-            temperature=0.7,
+        import requests
+        url = (
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            f"{_obtener_modelo_llm()}:generateContent"
         )
-        return response.choices[0].message.content
-
-    except Exception as e:
-        return _feedback_por_reglas(resultado_star) + f"\n\n*(Nota: feedback IA no disponible: {str(e)[:60]})*"
+        payload = {
+            "system_instruction": {"parts": [{"text": SYSTEM_PROMPT}]},
+            "contents": [{"role": "user", "parts": [{"text": mensaje}]}],
+            "generationConfig": {"temperature": 0.4, "maxOutputTokens": 800},
+        }
+        r = requests.post(url, params={"key": api_key}, json=payload, timeout=25)
+        r.raise_for_status()
+        texto = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+        if not texto:
+            raise ValueError("respuesta vacía")
+        return texto, "ia"
+    except Exception:
+        return _feedback_por_reglas(resultado_star), "reglas"
 
 
 def _feedback_por_reglas(resultado_star: dict) -> str:
@@ -233,6 +269,21 @@ def _feedback_por_reglas(resultado_star: dict) -> str:
         return fb
 
 
+# ─── Detección de respuestas hipotéticas ─────────────────────────────────────
+# Hallazgo H1 (caso límite C4 en pruebas): el clasificador marca como S-T-A
+# respuestas en condicional ("yo haría...") que no cuentan un caso real.
+PATRON_HIPOTETICO = re.compile(
+    r"\b(si (yo )?(tuviera|estuviera|fuera|me pasara|me tocara)|"
+    r"(yo )?(har[ií]a|intentar[ií]a|buscar[ií]a|hablar[ií]a|tratar[ií]a|propondr[ií]a|escuchar[ií]a)|"
+    r"lo que har[ií]a|deber[ií]a)\b",
+    re.IGNORECASE,
+)
+
+
+def es_hipotetica(texto: str) -> bool:
+    return len(PATRON_HIPOTETICO.findall(texto)) >= 2
+
+
 # ─── Preguntas de ejemplo ─────────────────────────────────────────────────────
 PREGUNTAS_EJEMPLO = [
     "Cuéntame de una vez que tuviste que trabajar bajo presión y cómo lo manejaste.",
@@ -254,6 +305,20 @@ def main():
         <small>AD5018 IA para Negocios · UTEC 2026-2</small>
     </div>
     """, unsafe_allow_html=True)
+
+    # Aviso de IA y privacidad (transparencia + Ley N.° 29733)
+    st.info(
+        "🤖 **Estás usando una herramienta con Inteligencia Artificial.** "
+        "Un modelo entrenado por el equipo detecta los componentes STAR de tu respuesta "
+        "y un modelo de lenguaje redacta el feedback. Es una herramienta de práctica: "
+        "puede equivocarse y no es una evaluación oficial ni predice si te contratarán."
+    )
+    st.caption(
+        "🔒 **Privacidad:** tu respuesta solo se usa para darte feedback en esta sesión. "
+        "No se guarda ni se asocia a tu identidad. Se envía al proveedor del modelo de lenguaje "
+        "(Google Gemini) únicamente para generar el feedback. Evita escribir datos personales "
+        "como tu DNI, teléfono o nombres de terceros (Ley N.° 29733)."
+    )
 
     # Cargar modelos
     modelos, umbrales = cargar_modelos()
@@ -318,19 +383,6 @@ def main():
         color = "🟢" if palabras >= 50 else "🟡" if palabras >= 20 else "🔴"
         st.caption(f"{color} {palabras} palabras {'(longitud recomendada ≥50)' if palabras < 50 else '✓'}")
 
-    # ── Configuración API (opcional) ──────────────────────────────────────────
-    with st.expander("⚙️ Configuración — Feedback con IA (opcional)"):
-        st.markdown(
-            "Para recibir feedback personalizado con GPT-4o-mini, ingresa tu OpenAI API Key. "
-            "Sin API Key, el sistema usa feedback basado en reglas."
-        )
-        api_key = st.text_input(
-            "OpenAI API Key:",
-            type="password",
-            placeholder="sk-...",
-            help="Tu clave no se guarda ni se envía a ningún servidor externo salvo OpenAI.",
-        )
-
     st.divider()
 
     # ── Botón de análisis ─────────────────────────────────────────────────────
@@ -343,6 +395,19 @@ def main():
 
     # ── Resultados ────────────────────────────────────────────────────────────
     if analizar and respuesta.strip():
+        if palabras < 20:
+            st.warning(
+                "⚠️ Tu respuesta es muy corta (menos de 20 palabras). El modelo fue entrenado con "
+                "respuestas más completas, así que este análisis puede ser poco confiable. "
+                "Intenta contar un caso real con más detalle."
+            )
+        hipotetica = es_hipotetica(respuesta)
+        if hipotetica:
+            st.warning(
+                "🤔 **Tu respuesta parece hipotética** (\"yo haría...\", \"si tuviera...\"). "
+                "En una entrevista por competencias te piden un caso que **sí viviste**. "
+                "El análisis STAR de abajo puede salir mejor de lo que es: cuenta una experiencia real."
+            )
         with st.spinner("Analizando tu respuesta..."):
             resultado = predecir_star(respuesta, modelos, umbrales)
 
@@ -406,12 +471,14 @@ def main():
         st.subheader("💡 Paso 4 — Feedback personalizado")
 
         with st.spinner("Generando feedback..."):
-            feedback = generar_feedback_rag(respuesta, resultado, api_key if api_key else "")
+            feedback, modo = generar_feedback(pregunta_final, respuesta, resultado, hipotetica)
 
-        st.markdown(
-            f'<div class="feedback-box">{feedback}</div>',
-            unsafe_allow_html=True,
-        )
+        with st.container(border=True):
+            st.markdown(feedback)
+        if modo == "ia":
+            st.caption("🤖 Feedback generado por IA (Google Gemini) a partir del análisis STAR del modelo. Puede contener errores.")
+        else:
+            st.caption("ℹ️ Feedback generado con reglas fijas a partir del análisis STAR (el servicio de IA no estuvo disponible).")
 
         # ── Recomendación de siguiente paso ───────────────────────────────────
         st.divider()
