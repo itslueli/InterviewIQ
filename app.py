@@ -158,26 +158,29 @@ html, body, [class*="css"] {
 .iq-pline { flex:1; height:2px; background:#DDD6FE; margin:0 0.4rem; border-radius:2px; }
 .iq-pline.done { background:#8B5CF6; }
 
-/* Paneles */
-.iq-panel {
-    background:#fff; border-radius:20px; padding:1.5rem;
-    border:2px solid #E9D5FF; box-shadow:0 2px 12px rgba(109,40,217,0.08);
-    margin-bottom:1rem;
+/* Containers nativos como paneles */
+div[data-testid="stVerticalBlockBorderWrapper"] {
+    background:#fff !important;
+    border:2px solid #DDD6FE !important;
+    border-radius:18px !important;
+    padding:1.2rem 1.3rem !important;
+    box-shadow:0 2px 12px rgba(109,40,217,0.08) !important;
+    margin-bottom:1rem !important;
 }
-.iq-panel-hd {
-    display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:1.1rem; padding-bottom:0.9rem; border-bottom:1.5px solid #F3F4F6;
+
+div[data-testid="stSelectbox"] > div > div {
+    background:#fff !important; border:2px solid #DDD6FE !important;
+    border-radius:12px !important; color:#111827 !important;
+    font-family:'Plus Jakarta Sans',sans-serif !important;
+    font-size:0.92rem !important; font-weight:500 !important;
+    min-height:48px !important;
 }
-.iq-panel-ttl { font-size:1rem; font-weight:800; color:#111827; }
-.iq-badge {
-    font-size:0.68rem; font-weight:700; padding:0.25rem 0.75rem;
-    border-radius:20px; background:#EDE9FE; color:#6D28D9;
-}
+
 .iq-qpreview {
-    background:#F5F3FF; border-left:4px solid #7C3AED;
+    background:#EDE9FE; border-left:4px solid #7C3AED;
     border-radius:0 12px 12px 0; padding:0.9rem 1rem;
     font-size:0.9rem; color:#3B0764; font-style:italic; line-height:1.6;
-    margin-top:0.75rem;
+    margin-top:0.6rem; margin-bottom:0.4rem;
 }
 
 /* Word counter */
@@ -287,18 +290,15 @@ html, body, [class*="css"] {
 .stButton > button:not([kind="primary"]):hover { background: #F5F3FF !important; }
 
 /* INPUTS */
-div[data-testid="stSelectbox"] > div > div {
-    background:#fff !important; border:2px solid #DDD6FE !important;
-    border-radius:12px !important; color:#111827 !important;
-    font-family:'Plus Jakarta Sans',sans-serif !important;
-    font-size:0.92rem !important; font-weight:500 !important;
-}
 div[data-testid="stTextArea"] textarea {
     background:#fff !important; border:2px solid #DDD6FE !important;
     border-radius:12px !important; color:#111827 !important;
     font-family:'Plus Jakarta Sans',sans-serif !important;
     font-size:0.92rem !important; line-height:1.7 !important;
     padding:1rem !important;
+}
+div[data-testid="stTextArea"] textarea::placeholder {
+    color:#9CA3AF !important; font-style:italic !important; opacity:1 !important;
 }
 div[data-testid="stTextArea"] textarea:focus,
 div[data-testid="stSelectbox"] > div > div:focus-within {
@@ -686,69 +686,75 @@ elif st.session_state.pagina == "analisis":
     </div>""", unsafe_allow_html=True)
 
     # ── Panel: Pregunta ────────────────────────────────────────────────────
-    st.markdown("""
-    <div class="iq-panel">
-      <div class="iq-panel-hd">
-        <div class="iq-panel-ttl">1 · Pregunta de entrevista</div>
-        <span class="iq-badge">BANCO</span>
-      </div>
-    </div>""", unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown("""
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    margin-bottom:0.9rem;padding-bottom:0.75rem;border-bottom:1.5px solid #F3F4F6;">
+          <span style="font-size:1rem;font-weight:800;color:#111827;">1 · Pregunta de entrevista</span>
+          <span style="font-size:0.68rem;font-weight:700;padding:0.25rem 0.75rem;
+                       border-radius:20px;background:#EDE9FE;color:#6D28D9;">BANCO</span>
+        </div>""", unsafe_allow_html=True)
 
-    pregunta_sel = st.selectbox(
-        "Pregunta:",
-        options=[""] + PREGUNTAS + ["✏️ Escribe tu propia pregunta..."],
-        index=0,
-        label_visibility="collapsed",
-    )
-
-    pregunta_custom = ""
-    if pregunta_sel == "✏️ Escribe tu propia pregunta...":
-        pregunta_custom = st.text_input(
-            "Tu pregunta:",
-            placeholder="Escribe tu pregunta de entrevista conductual...",
+        pregunta_sel = st.selectbox(
+            "Pregunta:",
+            options=["— Elige una pregunta del banco —"] + PREGUNTAS + ["✏️ Escribe tu propia pregunta..."],
+            index=0,
             label_visibility="collapsed",
         )
-        pregunta_final = pregunta_custom
-    else:
-        pregunta_final = pregunta_sel
 
-    if pregunta_final:
-        st.markdown(f'<div class="iq-qpreview">💬 &nbsp;"{pregunta_final}"</div>', unsafe_allow_html=True)
+        pregunta_custom = ""
+        if pregunta_sel == "✏️ Escribe tu propia pregunta...":
+            pregunta_custom = st.text_input(
+                "Tu pregunta:",
+                placeholder="Escribe tu pregunta de entrevista conductual...",
+                label_visibility="collapsed",
+            )
+            pregunta_final = pregunta_custom
+        elif pregunta_sel == "— Elige una pregunta del banco —":
+            pregunta_final = ""
+        else:
+            pregunta_final = pregunta_sel
+
+        if pregunta_final:
+            st.markdown(f'<div class="iq-qpreview">💬 &nbsp;"{pregunta_final}"</div>', unsafe_allow_html=True)
 
     # ── Panel: Respuesta ───────────────────────────────────────────────────
-    st.markdown("""
-    <div class="iq-panel" style="margin-top:1rem;">
-      <div class="iq-panel-hd">
-        <div class="iq-panel-ttl">2 · Tu respuesta</div>
-        <span class="iq-badge">STAR</span>
-      </div>
-    </div>""", unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown("""
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    margin-bottom:0.9rem;padding-bottom:0.75rem;border-bottom:1.5px solid #F3F4F6;">
+          <span style="font-size:1rem;font-weight:800;color:#111827;">2 · Tu respuesta</span>
+          <span style="font-size:0.68rem;font-weight:700;padding:0.25rem 0.75rem;
+                       border-radius:20px;background:#EDE9FE;color:#6D28D9;">STAR</span>
+        </div>""", unsafe_allow_html=True)
 
-    respuesta = st.text_area(
-        "Respuesta:",
-        placeholder="Ejemplo: En mi práctica en [empresa], estábamos en [situación]. Mi responsabilidad era [tarea]. Lo que hice fue [acciones concretas]. Como resultado, [logro + datos].",
-        height=175,
-        label_visibility="collapsed",
-    )
+        respuesta = st.text_area(
+            "Respuesta:",
+            placeholder="Ejemplo: En mi práctica en [empresa], estábamos en [situación]. Mi responsabilidad era [tarea]. Lo que hice fue [acciones concretas]. Como resultado, [logro + datos].",
+            height=175,
+            label_visibility="collapsed",
+        )
 
-    palabras = len(respuesta.split()) if respuesta.strip() else 0
-    if respuesta.strip():
-        pct_w = min(palabras / 150, 1.0)
-        if palabras >= 50:
-            fc, lc, lbl = "#4ADE80", "#15803D", f"{palabras} palabras ✓"
-        elif palabras >= 20:
-            fc, lc, lbl = "#FCD34D", "#B45309", f"{palabras} palabras — intenta llegar a 50"
+        palabras = len(respuesta.split()) if respuesta.strip() else 0
+        if respuesta.strip():
+            pct_w = min(palabras / 150, 1.0)
+            if palabras >= 50:
+                fc, lc, lbl = "#4ADE80", "#15803D", f"{palabras} palabras ✓"
+            elif palabras >= 20:
+                fc, lc, lbl = "#FCD34D", "#B45309", f"{palabras} palabras — intenta llegar a 50"
+            else:
+                fc, lc, lbl = "#F87171", "#DC2626", f"{palabras} palabras — muy corta"
+            st.markdown(f"""
+            <div class="iq-wc">
+              <span class="iq-wc-label">Longitud</span>
+              <span style="color:{lc};font-weight:700;font-size:0.75rem;">{lbl}</span>
+            </div>
+            <div class="iq-wc-track">
+              <div class="iq-wc-fill" style="width:{int(pct_w*100)}%;background:{fc};"></div>
+            </div>
+            """, unsafe_allow_html=True)
         else:
-            fc, lc, lbl = "#F87171", "#DC2626", f"{palabras} palabras — muy corta"
-        st.markdown(f"""
-        <div class="iq-wc">
-          <span class="iq-wc-label">Longitud</span>
-          <span style="color:{lc};font-weight:700;font-size:0.75rem;">{lbl}</span>
-        </div>
-        <div class="iq-wc-track">
-          <div class="iq-wc-fill" style="width:{int(pct_w*100)}%;background:{fc};"></div>
-        </div>
-        """, unsafe_allow_html=True)
+            palabras = 0
 
     # ── Botones ────────────────────────────────────────────────────────────
     st.write("")
