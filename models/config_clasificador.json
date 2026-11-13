@@ -3,7 +3,7 @@
     "situacion": 0.3,
     "tarea": 0.3,
     "accion": 0.75,
-    "resultado": 0.7
+    "resultado": 0.5
   },
   "modelo": "TF-IDF + Linear SVM",
   "f1_promedio": 0.8301,
