@@ -126,11 +126,11 @@ Sin autenticación ni base de datos persistente. Las respuestas del usuario no s
 
 ## Impacto esperado y medición
 
-| KR | Baseline (n=50) | Meta con MVP | Estado |
-|----|----------------|-------------|--------|
-| KR1 — Estudiantes poco/nada preparados | 60% | ≤ 40% | 🔄 En medición |
-| KR2 — Dificultad para estructurar respuestas STAR | 80% | ≤ 55% | 🔄 En medición |
-| KR3 — Rara vez reciben feedback estructurado | 40% | ≥ 90% | 🔄 En medición |
+| KR | Baseline (n=50) | Meta con MVP | Resultado real (n=7) | Cumple |
+|----|----------------|-------------|----------------------|--------|
+| KR1 — Estudiantes poco/nada preparados | 60% | ≤ 40% | 71% → **29%** (−42 pp) | ✅ |
+| KR2 — Dificultad para estructurar respuestas STAR | 80% | ≤ 55% | 57% → **29%** (−28 pp) | ✅ |
+| KR3 — Rara vez reciben feedback estructurado | 40% | ≥ 90% | **100%** (7/7 usuarios) | ✅ |
 
 **Instrumento de medición:** Cuestionario pre/post aplicado a ≥ 5 usuarios externos al equipo.  
 **Protocolo completo:** `mvp/evidencia/pruebas_usuario.md`  
@@ -146,5 +146,5 @@ Sin autenticación ni base de datos persistente. Las respuestas del usuario no s
 | Modelos entrenados y guardados (`models/`) | ✅ Listo |
 | App Streamlit (app.py) | ✅ Funcional |
 | Deploy en Streamlit Community Cloud | ✅ Activo — https://interviewiq-utec.streamlit.app/ |
-| Pruebas con ≥ 5 usuarios reales | 🔄 En curso |
-| Resultados OKR finales | 🔄 Pendiente pruebas |
+| Pruebas con ≥ 5 usuarios reales | ✅ Completado — 7 usuarios externos |
+| Resultados OKR finales | ✅ Completado — 3/3 KRs cumplidos |
