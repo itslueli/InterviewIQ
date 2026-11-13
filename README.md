@@ -1,102 +1,124 @@
 # InterviewIQ — Simulador Inteligente de Entrevistas por Competencias
-## AD5018 Inteligencia Artificial para Negocios · UTEC 2026-2
 
+**AD5018 Inteligencia Artificial para Negocios · UTEC 2026-2**  
 **Equipo:** Valeria Briceño · Lucía Rodríguez · Jennifer Patiño · Aaron Van Oord
 
 ---
 
 ## ¿Qué es InterviewIQ?
 
-InterviewIQ es un simulador conversacional de entrevistas por competencias diseñado para estudiantes universitarios peruanos de últimos ciclos que buscan prácticas preprofesionales o su primer empleo. Permite practicar entrevistas conductuales de manera recurrente y recibir retroalimentación estructurada sobre la calidad de las respuestas, sin depender de la disponibilidad de un entrevistador humano.
+InterviewIQ es un simulador de entrevistas por competencias diseñado para estudiantes universitarios peruanos de últimos ciclos que buscan prácticas preprofesionales o su primer empleo. Permite practicar entrevistas conductuales de manera recurrente y recibir retroalimentación estructurada sobre la calidad de sus respuestas, sin depender de la disponibilidad de un entrevistador humano.
 
-El sistema adapta la dificultad de las preguntas al nivel de preparación detectado de cada estudiante y evalúa si las respuestas incluyen los componentes de la metodología STAR (Situación, Tarea, Acción, Resultado).
+El sistema detecta automáticamente qué componentes de la metodología STAR (Situación, Tarea, Acción, Resultado) están presentes o ausentes en cada respuesta, y genera feedback personalizado para mejorarla.
+
+**MVP activo:** https://interviewiq-utec.streamlit.app/
 
 ---
 
 ## Problema que resuelve
 
-Los estudiantes universitarios peruanos de últimos ciclos tienen dificultad para preparar y mejorar sus respuestas en entrevistas laborales por competencias porque cuentan con oportunidades limitadas de práctica recurrente con retroalimentación estructurada. Una encuesta propia a 50 estudiantes confirma la escala del problema: **60% se siente poco o nada preparado**, **80% reporta dificultad para estructurar respuestas conductuales** y **40% rara vez recibe retroalimentación estructurada** al practicar.
+Los estudiantes universitarios peruanos de últimos ciclos tienen dificultad para preparar y mejorar sus respuestas en entrevistas laborales por competencias porque cuentan con oportunidades limitadas de práctica recurrente con retroalimentación estructurada.
+
+Una encuesta propia a 50 estudiantes universitarios confirma la escala del problema:
+
+| Indicador | Resultado |
+|-----------|-----------|
+| Se sienten poco o nada preparados para entrevistas | **60%** |
+| Reportan dificultad para estructurar respuestas conductuales | **80%** |
+| Rara vez reciben retroalimentación estructurada al practicar | **40%** |
+
+Contexto nacional: 14.3% de desempleo juvenil (INEI, 2024), 7 de cada 10 jóvenes en situación de inadecuación ocupacional (MTPE, 2024).
 
 ---
 
 ## Arquitectura del sistema
 
-El sistema integra dos etapas de clasificación y un componente generativo RAG:
+El MVP integra dos componentes principales: un clasificador STAR (A2) y un generador de feedback con IA (G1).
 
 ```
-[Selección de rol objetivo]
-        ↓
-[Cuestionario diagnóstico — 5 ítems]
-        ↓
-[Clasificador de nivel — Logistic Regression]
-Output: nivel ∈ {básico, intermedio, avanzado}
-        ↓
-[Generación de preguntas conductuales adaptadas al rol y nivel — LLM]
-        ↓
-[Respuesta del usuario en texto libre]
-        ↓
-[Clasificador STAR — A2 (TF-IDF + LR baseline vs TF-IDF + SVM)]
-Output: S ∈ {0,1}, T ∈ {0,1}, A ∈ {0,1}, R ∈ {0,1}
-        ↓
-[RAG — recuperación de contexto del corpus (FAISS/ChromaDB)]
-        ↓
-[LLM — genera feedback personalizado con salida A2 + contexto recuperado]
-        ↓
+[Selección de pregunta conductual]
+         ↓
+[Respuesta en texto libre del usuario]
+         ↓
+[Clasificador STAR — A2 (TF-IDF + Linear SVM)]
+  → Detecta S / T / A / R presentes o ausentes
+  → Calcula probabilidad por componente
+         ↓
+[Componente Generativo — G1 (Gemini 2.5 Flash)]
+  → Recibe: pregunta + respuesta + componentes detectados
+  → Genera feedback contextualizado
+  → Fallback a reglas estructuradas si no hay API key
+         ↓
 [Feedback estructurado mostrado al estudiante]
 ```
 
-### Componentes
+---
+
+## Componentes
 
 | Componente | Descripción | Tecnología |
-|---|---|---|
-| **Clasificador de nivel** | Logistic Regression sobre cuestionario diagnóstico (5 variables). Asigna nivel {básico / intermedio / avanzado} | scikit-learn |
-| **Clasificador STAR (A2)** | Clasificación multilabel (S/T/A/R = 0 o 1) por etiqueta. Se comparan TF-IDF + LR (baseline) y TF-IDF + Linear SVM (alternativo) | scikit-learn |
-| **Pipeline RAG (G2)** | Chunking del corpus → embeddings → índice vectorial → retrieval top-k → LLM genera feedback | OpenAI, FAISS/ChromaDB |
-| **Interfaz** | Aplicación web conversacional: cuestionario → selección de rol → práctica → feedback | Streamlit |
+|------------|-------------|------------|
+| Clasificador STAR (A2) | Clasificación multilabel (S/T/A/R = 0 ó 1) por etiqueta. Compara TF-IDF + LR (baseline) vs TF-IDF + Linear SVM (modelo final). Umbrales ajustados por componente. | scikit-learn |
+| Componente Generativo (G1) | Gemini 2.5 Flash vía API REST. Recibe la pregunta, respuesta y componentes detectados, genera feedback contextualizado. Fallback a reglas estructuradas. | requests + Gemini API |
+| Interfaz | Aplicación web: selección de pregunta → respuesta en texto libre → análisis STAR → feedback | Streamlit |
 
 ---
 
-## Datasets
-
-El sistema requiere tres recursos de datos:
+## Dataset
 
 | Recurso | Descripción | Estado |
-|---|---|---|
-| **R1 — Cuestionario diagnóstico** | Respuestas de estudiantes al cuestionario de 5 ítems para entrenar el clasificador de nivel | 🟡 Pendiente de recolección (Semana 13) |
-| **R2 — InterviewIQ-STAR** | ~200 pares (pregunta conductual · respuesta · etiquetas S/T/A/R = 0/1). Construido por el equipo con respuestas sintéticas y reales | 🟡 Pendiente de construcción (Semanas 7–8) |
-| **R3 — Corpus RAG** | ~20–50 documentos sobre metodología STAR y competencias por rol. Fuentes: USC Career Center, UC Santa Cruz Career Success, Wilkie & Rosendale (2024), Marcus et al. (2023), ESCO | 🟡 Fuentes verificadas; corpus a cerrar (Semana 7) |
+|---------|-------------|--------|
+| **R1 — Cuestionario diagnóstico** | Encuesta a 50 estudiantes sobre preparación para entrevistas (baseline OKRs) | ✅ Construido |
+| **R2 — InterviewIQ-STAR** | 200 pares (pregunta conductual, respuesta, etiquetas S/T/A/R = 0/1) construidos por el equipo con respuestas sintéticas y reales | ✅ Construido — `data/raw/interviewiq_star_v1.csv` |
 
 ### Esquema de R2 — InterviewIQ-STAR
 
 ```
-id, pregunta, respuesta, situacion, tarea, accion, resultado, fuente, anotador
+id, pregunta, respuesta, situacion, tarea, accion, resultado, fuente
 ```
 
 - `situacion`, `tarea`, `accion`, `resultado` ∈ {0, 1}
-- `fuente` ∈ {sintetica, real}
-- Etiquetado con doble anotador + kappa de Cohen para control de calidad
+- `fuente` ∈ {sintético, real}
+- Split: 70% entrenamiento / 10% validación / 20% prueba
 
 ---
 
-## Métricas de evaluación
+## Métricas del modelo (A2)
 
-| Componente | Métrica | Criterio mínimo |
-|---|---|---|
-| Clasificador de nivel (Etapa 1) | Accuracy en test | ≥ 0.65 |
-| Clasificador STAR A2 (Etapa 2) | Macro F1 en test | ≥ 0.65 |
-| Pipeline RAG G2 | Retrieval precision@k | ≥ 0.80 |
+**Modelo seleccionado:** TF-IDF bigramas + Linear SVM (CalibratedClassifierCV)  
+**Vectorizador:** TF-IDF, bigramas, max_features=5000, sublinear_tf=True
+
+| Componente | F1 Macro | Umbral | Criterio ≥ 0.65 |
+|------------|----------|--------|----------------|
+| S — Situación | **0.865** | 0.30 | ✅ CUMPLE |
+| T — Tarea | **0.822** | 0.30 | ✅ CUMPLE |
+| A — Acción | **0.804** | 0.75 | ✅ CUMPLE |
+| R — Resultado | **0.829** | 0.70 | ✅ CUMPLE |
+| **Promedio** | **0.830** | — | ✅ CUMPLE |
+
+#### Comparación baseline vs modelo final
+
+| Componente | LR Baseline F1 | SVM Final F1 | Ganador |
+|------------|---------------|-------------|---------|
+| S — Situación | 0.840 | **0.896** | SVM ✓ |
+| T — Tarea | 0.874 | **0.900** | SVM ✓ |
+| A — Acción | 0.881 | 0.881 | Empate |
+| R — Resultado | 0.774 | **0.868** | SVM ✓ |
+| **Promedio** | 0.842 | **0.886** | **SVM** |
+
+> Los umbrales fueron ajustados en validación priorizando minimizar Falsos Positivos (el error más costoso en este dominio: decirle al estudiante que un componente está presente cuando no lo está).
 
 ---
 
 ## Impacto esperado (OKRs)
 
-| KR | Baseline | Meta |
-|---|---|---|
-| Estudiantes poco/nada preparados para entrevistas | 60% | ≤ 40% tras uso del MVP |
-| Estudiantes con dificultad para estructurar respuestas STAR | 80% | ≤ 55% tras sesiones de práctica |
-| Estudiantes que rara vez reciben feedback estructurado | 40% | ≥ 90% reciben feedback en al menos 1 sesión |
+| KR | Baseline | Meta con MVP | Estado |
+|----|----------|-------------|--------|
+| KR1 — Estudiantes poco/nada preparados para entrevistas | 60% | ≤ 40% tras uso del MVP | 🔄 En medición |
+| KR2 — Estudiantes con dificultad para estructurar respuestas STAR | 80% | ≤ 55% tras sesiones de práctica | 🔄 En medición |
+| KR3 — Estudiantes que rara vez reciben feedback estructurado | 40% | ≥ 90% reciben feedback en al menos 1 sesión | 🔄 En medición |
 
-Medición: cuestionario pre/post con ≥ 15 usuarios en Semana 13.
+Medición: cuestionario pre/post con ≥ 5 usuarios reales. Ver `mvp/evidencia/pruebas_usuario.md`.
 
 ---
 
@@ -104,43 +126,37 @@ Medición: cuestionario pre/post con ≥ 15 usuarios en Semana 13.
 
 ```
 InterviewIQ/
+├── README.md                              # Este archivo
+├── resumen_ejecutivo.md                   # Resumen ejecutivo del proyecto
+├── app.py                                 # Aplicación Streamlit (MVP)
+├── requirements.txt                       # Dependencias Python
 │
-├── plantillas/
-│   ├── plantilla_1_problem_statement.md
-│   ├── plantilla_2_data_readiness.md
-│   └── plantilla_3_ai_product_canvas.md
+├── models/                                # Modelos entrenados
+│   ├── clasificador_star_situacion.pkl
+│   ├── clasificador_star_tarea.pkl
+│   ├── clasificador_star_accion.pkl
+│   ├── clasificador_star_resultado.pkl
+│   └── config_clasificador.json           # Umbrales óptimos por componente
 │
 ├── data/
-│   ├── raw/
-│   │   ├── interviewiq_star_v1.csv       # Dataset STAR (R2) — a construir
-│   │   ├── corpus_rag/                   # Documentos del corpus RAG (R3)
-│   │   └── schema.md                     # Esquema y protocolo del dataset
-│   └── processed/                        # Datos limpios con split 70/10/20
+│   └── raw/
+│       └── interviewiq_star_v1.csv        # Dataset R2 — 200 pares etiquetados
 │
-├── notebooks/
-│   ├── 01_clasificador_nivel.ipynb       # Logistic Regression sobre cuestionario
-│   ├── 02_baseline_tfidf_lr.ipynb        # Baseline STAR: TF-IDF + LR
-│   ├── 03_modelo_alternativo_svm.ipynb   # Alternativo STAR: TF-IDF + SVM
-│   └── 04_rag_pipeline.ipynb             # Pipeline RAG completo
+├── notebooks/                             # Notebooks de entrenamiento
+│   ├── 01_baseline_tfidf_lr.ipynb         # Baseline: TF-IDF + Logistic Regression
+│   └── 02_modelo_svm.ipynb                # Modelo final: TF-IDF + Linear SVM
 │
-├── src/
-│   └── app/                              # Interfaz Streamlit
+├── plantillas/                            # Plantillas del curso AD5018
+│   ├── plantilla_1_problem_solution.md
+│   ├── plantilla_2_mvp_scope.md
+│   ├── plantilla_3_technical_decisions.md
+│   └── plantilla_4_scorecard_risk.md
 │
-├── docs/
-│   ├── cuestionario_diagnostico_v1.md
-│   ├── protocolo_etiquetado_star.md
-│   ├── system_prompt_v2.md
-│   └── consentimiento_informado.md
-│
-├── evaluation/
-│   ├── clasificador_nivel.md
-│   ├── comparacion_modelos_a2.md
-│   ├── consultas_prueba_rag.md
-│   └── metricas_g2.md
-│
-├── cronograma.md
-├── resumen_ejecutivo.md
-└── README.md
+└── mvp/
+    ├── README_mvp.md                      # Instrucciones para el evaluador
+    └── evidencia/
+        ├── pruebas_usuario.md             # Registro de pruebas con ≥5 usuarios reales
+        └── resultados_okr.md             # Resultados KR1, KR2, KR3
 ```
 
 ---
@@ -148,36 +164,59 @@ InterviewIQ/
 ## Stack tecnológico
 
 | Capa | Tecnología |
-|---|---|
-| Clasificadores | Python 3.10 · scikit-learn |
-| Embeddings | OpenAI text-embedding-3-small |
-| Índice vectorial | FAISS o ChromaDB (local) |
-| LLM | GPT-4o-mini (API OpenAI) |
+|------|------------|
+| Clasificador STAR (A2) | Python 3.10 · scikit-learn (TF-IDF + LinearSVC + CalibratedClassifierCV) |
+| Componente Generativo (G1) | Gemini 2.5 Flash · API REST vía `requests` |
 | Interfaz | Streamlit |
-| Despliegue | Streamlit Community Cloud |
+| Deploy | Streamlit Community Cloud |
 
 ---
 
-## Hoja de ruta
+## Cómo usar el MVP
 
-| Semana | Hito |
-|---|---|
-| 6 | PC1 — Entrega de plantillas + README + presentación |
-| 7–8 | Construcción y etiquetado del dataset InterviewIQ-STAR |
-| 9 | Entrenamiento del clasificador de nivel + baseline STAR A2 |
-| 10 | Modelo alternativo A2 + inicio del pipeline RAG |
-| 11 | Pipeline RAG G2 funcional |
-| **12** | **MVP integrado y desplegado (URL pública)** |
-| 13 | Evaluación con ≥ 15 usuarios reales |
-| 14 | PC2 — Sustentación |
+1. Abre **https://interviewiq-utec.streamlit.app/**
+2. Elige una pregunta de entrevista conductual del menú
+3. Escribe tu respuesta en el cuadro de texto (mínimo 20 palabras)
+4. Presiona **"Analizar respuesta →"**
+5. Revisa el análisis STAR (componentes presentes/ausentes con probabilidad) y el feedback
+
+No se requiere cuenta, instalación ni configuración adicional.
+
+---
+
+## Decisiones técnicas relevantes
+
+| Decisión | Alternativa descartada | Razón |
+|----------|----------------------|-------|
+| Linear SVM como clasificador final | Logistic Regression (baseline) | SVM supera baseline en F1 en 3 de 4 componentes |
+| Umbrales ajustados por componente | Umbral fijo 0.5 | Minimizar Falsos Positivos es prioritario en este dominio |
+| Gemini 2.5 Flash vía API REST | RAG con GPT-4o-mini + ChromaDB | RAG fuera del alcance del MVP por restricciones de tiempo; fallback a reglas garantiza disponibilidad |
+| Streamlit | FastAPI + frontend custom | Velocidad de desarrollo para MVP académico |
+
+Ver detalle en `plantillas/plantilla_3_technical_decisions.md`.
 
 ---
 
 ## Consideraciones éticas y legales
 
-- Las respuestas reales de usuarios se recolectan con consentimiento informado y se anonimiza la información personal antes de almacenarla, en cumplimiento de la **Ley N.° 29733** (Ley de Protección de Datos Personales, Perú).
-- Las respuestas sintéticas generadas con LLM para el dataset son revisadas manualmente antes de ser etiquetadas.
-- El system prompt del componente G2 prohíbe explícitamente: inventar experiencias del usuario, afirmar probabilidades de contratación, y contradecir la salida del modelo A2.
-- Las fuentes del corpus RAG están verificadas y se documentan sus licencias de uso.
+- Las respuestas de usuarios se procesan solo para generar feedback. **No se almacenan** entre sesiones (Streamlit no persiste estado).
+- Cumplimiento de **Ley N.° 29733** (Protección de Datos Personales del Perú): aviso visible en la app, finalidad específica, comunicación HTTPS.
+- El dataset R2 fue construido con respuestas sintéticas; las respuestas reales recolectadas en pruebas de usuario son anonimizadas.
+- La app incluye disclaimer visible: *"InterviewIQ es una herramienta de práctica, no una evaluación oficial."*
 
 ---
+
+## Tabla de contribuciones
+
+| Componente | Lucía | Valeria | Jennifer | Aaron |
+|------------|-------|---------|----------|-------|
+| Dataset R2 (200 pares etiquetados) | | | ✓ | |
+| Entrenamiento y evaluación modelo A2 | | | ✓ | |
+| App Streamlit (app.py) | ✓ | | | |
+| Deploy en Streamlit Community Cloud | ✓ | | | |
+| Pruebas con usuarios reales | ✓ | | | ✓ |
+| Documentación (plantillas 1-4) | | ✓ | | |
+| Resumen ejecutivo | | ✓ | | |
+| Presentación PC2 | | | | ✓ |
+| Métricas y análisis del modelo | | | ✓ | |
+| OKRs y medición de impacto | ✓ | | | |
