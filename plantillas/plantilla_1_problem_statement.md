@@ -6,8 +6,11 @@
 
 **Equipo:**
 - Integrante 1: Valeria Briceño
-- Integrante 2: Lucia Rodriguez
-- Integrante 3: Aaron Van Oord
+- Integrante 2: Lucía Rodríguez
+- Integrante 3: Jennifer Patiño
+- Integrante 4: Aaron Van Oord
+
+> **Nota de versión final (PC2 — Semana 14):** Esta plantilla corresponde al diseño original (PC1). El MVP implementado en PC2 realizó los siguientes ajustes respecto al plan inicial: (1) la **Etapa 1** (clasificador de nivel de preparación) quedó fuera del alcance del MVP por restricciones de tiempo — el clasificador STAR (Etapa 2) se implementó completo; (2) el componente generativo bajó de **G2 (RAG con GPT-4o-mini + ChromaDB)** a **G1 (Gemini 2.5 Flash vía API REST)** con fallback a reglas estructuradas. El problema, el usuario objetivo y los OKRs se mantienen sin cambios.
 
 ---
 
@@ -66,7 +69,7 @@ El modelo principal identificará la presencia o ausencia de los componentes **S
 
 **Nivel de profundidad elegido:**
 - [ ] **A1**
-- [x] **A2** — compara modelos y ajusta el umbral según el costo del error
+- [x] **A2** — compara modelos y ajusta el umbral según el costo del error *(implementado: TF-IDF bigramas + Linear SVM con CalibratedClassifierCV; F1 promedio = 0.830)*
 - [ ] **A3**
 
 **Compromiso A2:** se entrenará un baseline y al menos un modelo alternativo para la detección STAR. Se compararán con métricas adecuadas y se justificará el umbral considerando el costo de falsos positivos y falsos negativos.
@@ -81,8 +84,8 @@ La capa generativa cumple dos funciones según la etapa del flujo:
 2. **Generación de retroalimentación personalizada** sobre cada respuesta del usuario, utilizando el resultado del clasificador STAR (Etapa 2) y conocimiento recuperado de fuentes seleccionadas sobre entrevistas y metodología STAR.
 
 **Nivel de profundidad elegido:**
-- [ ] **G1**
-- [x] **G2 — RAG**
+- [x] **G1** *(implementado en MVP: Gemini 2.5 Flash vía API REST con fallback a reglas estructuradas)*
+- [ ] **G2 — RAG** *(planeado en PC1; quedó fuera del MVP como deuda técnica)*
 - [ ] **G3**
 - [ ] **G4**
 
@@ -120,7 +123,9 @@ El clasificador de nivel (Etapa 1) envía el nivel asignado al generador de preg
 
 - [ ] Vamos a fondo en el **componente generativo** (G3 o G4) y mantenemos el analítico en A1
 - [ ] Vamos a fondo en el **componente analítico** (A3) y mantenemos el generativo en G1
-- [x] **Nos quedamos en un punto intermedio en ambos (A2 + G2)**
+- [x] **Nos quedamos en un punto intermedio en ambos (A2 + G1)**
+
+> **Actualización PC2:** el componente generativo bajó de G2 a G1. El RAG completo quedó como deuda técnica documentada en `plantillas/plantilla_4_scorecard_risk.md`.
 
 **¿Por qué esa elección?**
 
