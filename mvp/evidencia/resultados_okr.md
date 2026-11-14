@@ -3,9 +3,8 @@
 
 **Proyecto:** InterviewIQ  
 **Curso:** AD5018 — Inteligencia Artificial para Negocios · UTEC 2026-2  
-**Equipo:** Valeria Briceño · Lucía Rodríguez · Aaron Van Oord  
-**MVP URL:** *(pegar URL de Streamlit aquí)*  
-**Fecha de medición:** Noviembre 2026
+**Equipo:** Valeria Briceño · Lucía Rodríguez · Jennifer Patiño · Aaron Van Oord  
+**MVP URL:** https://interviewiq-utec.streamlit.app/  
 
 ---
 
@@ -23,21 +22,23 @@
 
 ## Resultados reales (pruebas con usuarios externos)
 
-> Completar con los datos reales de las pruebas de usuario. Ver protocolo completo en `mvp/evidencia/pruebas_usuario.md`.
+> Escala de preparación: 1 = Nada preparado/a · 5 = Muy preparado/a  
+> Escala de dificultad STAR: 1 = Nada difícil · 5 = Muy difícil  
+> KR1 y KR2: valores 1-2 = "poco/nada preparado" o "con dificultad"
 
-| KR | Baseline | Meta | Resultado real | Cumple |
-|----|----------|------|---------------|--------|
-| KR1 | 60% | ≤ 40% | ___% | ☐ |
-| KR2 | 80% | ≤ 55% | ___% | ☐ |
-| KR3 | 40% | ≥ 90% | ___% | ☐ |
+| KR | Baseline | Meta | Pre-MVP | Post-MVP | Resultado | Cumple |
+|----|----------|------|---------|----------|-----------|--------|
+| KR1 | 60% | ≤ 40% | **71%** (5/7 con valor ≤ 2) | **29%** (2/7 con valor ≤ 2) | 71% → 29% | ✅ |
+| KR2 | 80% | ≤ 55% | **57%** (4/7 con valor ≥ 4) | **29%** (2/7 con valor ≥ 4) | 57% → 29% | ✅ |
+| KR3 | 40% | ≥ 90% | — | **100%** (7/7 recibieron feedback) | 100% | ✅ |
 
-**Muestra:** ___ usuarios externos al equipo (meta: ≥ 5)  
-**Período de prueba:** Noviembre 2026  
-**Instrumento:** Cuestionario pre/post aplicado a cada usuario (mismas preguntas del baseline original)
+**Muestra:** 7 usuarios externos al equipo  
+**Período de prueba:** 13 de noviembre de 2026  
+**Instrumento:** Cuestionario pre/post (preguntas 1-3 pre, preguntas 5-6 post)
 
 ---
 
-## Métricas técnicas del MVP (ya disponibles)
+## Métricas técnicas del MVP
 
 | Métrica | Meta PC1 | Resultado | Cumple |
 |---------|----------|-----------|--------|
@@ -46,23 +47,21 @@
 | F1 componente T — Tarea | ≥ 0.65 | **0.822** | ✅ |
 | F1 componente A — Acción | ≥ 0.65 | **0.804** | ✅ |
 | F1 componente R — Resultado | ≥ 0.65 | **0.829** | ✅ |
-| MVP con URL pública | Sí | *(pendiente deploy)* | 🔄 |
-| Feedback coherente con output A2 (Patrón 1) | Siempre | ✅ G2 siempre recibe output de A2 | ✅ |
+| MVP con URL pública | Sí | https://interviewiq-utec.streamlit.app/ | ✅ |
+| Feedback coherente con output A2 (Patrón 1) | Siempre | G1 siempre recibe output de A2 | ✅ |
 
 ---
 
 ## Análisis
 
-*(Completar después de las pruebas de usuario)*
-
 **¿Qué funcionó?**  
-_
+El flujo completo fue completado de forma autónoma por 6 de 7 usuarios sin necesitar explicación. El feedback de Gemini fue calificado como "Muy útil" por todos los usuarios que respondieron esa pregunta. El 100% indicó que usaría la herramienta para prepararse para una entrevista real.
 
 **¿Qué no alcanzó la meta?**  
-_
+Todos los KRs fueron cumplidos. Un usuario indicó que necesitó ayuda para usar la app.
 
 **¿Qué cambiaría el equipo si tuviera más tiempo?**  
-_
+Según comentarios de usuarios: añadir más variedad de colores en la interfaz y ampliar el banco de preguntas por rol.
 
 ---
 
@@ -70,7 +69,7 @@ _
 
 | Evidencia | Ubicación |
 |-----------|-----------|
-| Registro de pruebas de usuario (5 usuarios) | `mvp/evidencia/pruebas_usuario.md` |
+| Registro de pruebas de usuario (7 usuarios) | `mvp/evidencia/pruebas_usuario.md` |
 | Métricas del clasificador STAR | `plantillas/plantilla_4_scorecard_risk.md` |
-| Notebook de entrenamiento (output) | Adjunto en sustentación |
-| URL del MVP | *(pegar aquí)* |
+| Notebook de entrenamiento | `notebooks/02_modelo_svm.ipynb` |
+| URL del MVP | https://interviewiq-utec.streamlit.app/ |
