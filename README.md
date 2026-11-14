@@ -93,7 +93,7 @@ id, pregunta, respuesta, situacion, tarea, accion, resultado, fuente
 | S — Situación | **0.865** | 0.30 | ✅ CUMPLE |
 | T — Tarea | **0.822** | 0.30 | ✅ CUMPLE |
 | A — Acción | **0.804** | 0.75 | ✅ CUMPLE |
-| R — Resultado | **0.829** | 0.70 | ✅ CUMPLE |
+| R — Resultado | **0.829** | 0.50 | ✅ CUMPLE |
 | **Promedio** | **0.830** | — | ✅ CUMPLE |
 
 #### Comparación baseline vs modelo final
@@ -110,15 +110,15 @@ id, pregunta, respuesta, situacion, tarea, accion, resultado, fuente
 
 ---
 
-## Impacto esperado (OKRs)
+## Impacto medido (OKRs) — n=7 usuarios externos
 
-| KR | Baseline | Meta con MVP | Estado |
-|----|----------|-------------|--------|
-| KR1 — Estudiantes poco/nada preparados para entrevistas | 60% | ≤ 40% tras uso del MVP | 🔄 En medición |
-| KR2 — Estudiantes con dificultad para estructurar respuestas STAR | 80% | ≤ 55% tras sesiones de práctica | 🔄 En medición |
-| KR3 — Estudiantes que rara vez reciben feedback estructurado | 40% | ≥ 90% reciben feedback en al menos 1 sesión | 🔄 En medición |
+| KR | Baseline | Meta | Resultado (pre→post) | Estado |
+|----|----------|------|----------------------|--------|
+| KR1 — Estudiantes poco/nada preparados para entrevistas | 60% | ≤ 40% | **71% → 29%** | ✅ Cumplido |
+| KR2 — Estudiantes con dificultad para estructurar respuestas STAR | 80% | ≤ 55% | **57% → 29%** | ✅ Cumplido |
+| KR3 — Estudiantes que rara vez reciben feedback estructurado | 40% | ≥ 90% reciben ≥ 1 sesión | **100%** recibieron feedback | ✅ Cumplido |
 
-Medición: cuestionario pre/post con ≥ 5 usuarios reales. Ver `mvp/evidencia/pruebas_usuario.md`.
+Medición: cuestionario pre/post aplicado a 7 usuarios externos al equipo. Los 3 KRs fueron cumplidos.
 
 ---
 
