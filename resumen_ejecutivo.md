@@ -85,8 +85,10 @@ Split: 70% entrenamiento / 10% validación / 20% prueba.
 | S — Situación | 0.840 | **0.865** | 0.30 | ✅ CUMPLE |
 | T — Tarea | 0.874 | **0.822** | 0.30 | ✅ CUMPLE |
 | A — Acción | 0.881 | **0.804** | 0.75 | ✅ CUMPLE |
-| R — Resultado | 0.774 | **0.829** | 0.70 | ✅ CUMPLE |
+| R — Resultado | 0.774 | **0.829** | 0.50* | ✅ CUMPLE |
 | **Promedio** | 0.842 | **0.830** | — | ✅ CUMPLE |
+
+> \* El F1 de R se calculó con umbral 0.70; el umbral vigente es 0.50 (ajustado tras pruebas internas). Recalcular en el notebook.
 
 > Los umbrales fueron ajustados en validación usando: `score = F1 − 0.5 × tasa_FP`. El error más costoso en este dominio es el Falso Positivo (decirle al usuario que un componente está presente cuando no lo está).
 
@@ -103,10 +105,10 @@ Split: 70% entrenamiento / 10% validación / 20% prueba.
 
 | Modo | Latencia aprox. | Disponibilidad |
 |------|----------------|---------------|
-| Gemini 2.5 Flash | 1–3 seg | Requiere `GEMINI_API_KEY` en Streamlit secrets |
+| Gemini 2.5 Flash | Pocos segundos (no medido formalmente) | Requiere `GEMINI_API_KEY` en Streamlit secrets |
 | Fallback (reglas) | < 0.5 seg | Siempre disponible |
 
-**Nota de scope:** El pipeline RAG completo (GPT-4o-mini + ChromaDB + corpus de entrevistas) quedó fuera del MVP por restricciones de tiempo. Documentado como deuda técnica en `plantillas/plantilla_3_technical_decisions.md`.
+**Nota de scope:** El pipeline RAG completo (GPT-4o-mini + ChromaDB + corpus de entrevistas) quedó fuera del MVP por restricciones de tiempo. Documentado en la Plantilla 3 (nota de versión final) y como deuda técnica en la Plantilla 4 (sección B5).
 
 ---
 
@@ -126,13 +128,15 @@ Sin autenticación ni base de datos persistente. Las respuestas del usuario no s
 
 ## Impacto esperado y medición
 
-| KR | Baseline (n=50) | Meta con MVP | Resultado real (n=7) | Cumple |
+| KR | Baseline (n=50) | Meta con MVP | Resultado real (n=8) | Cumple |
 |----|----------------|-------------|----------------------|--------|
-| KR1 — Estudiantes poco/nada preparados | 60% | ≤ 40% | 71% → **29%** (−42 pp) | ✅ |
-| KR2 — Dificultad para estructurar respuestas STAR | 80% | ≤ 55% | 57% → **29%** (−28 pp) | ✅ |
-| KR3 — Rara vez reciben feedback estructurado | 40% | ≥ 90% | **100%** (7/7 usuarios) | ✅ |
+| KR1 — Estudiantes poco/nada preparados | 60% | ≤ 40% | 62.5% → **25%** (−37.5 pp) | ✅ (indicativo) |
+| KR2 — Dificultad para estructurar respuestas STAR | 80% | ≤ 55% | 33% → **17%** (n=6) | ✅ (indicativo) |
+| KR3 — Reciben feedback estructurado en ≥ 1 sesión | 40% | ≥ 90% | 50% → **87.5%** (indirecto) | ⚠️ Cerca de la meta |
 
-**Instrumento de medición:** Cuestionario pre/post aplicado a ≥ 5 usuarios externos al equipo.  
+> Muestra pequeña y por conveniencia: los resultados son indicativos, no estadísticamente concluyentes. KR3 se midió de forma indirecta porque el formulario no incluyó la pregunta "¿Recibiste feedback?".
+
+**Instrumento de medición:** Cuestionario pre/post (Google Forms, anónimo) aplicado a 8 usuarios externos al equipo.  
 **Protocolo completo:** `mvp/evidencia/pruebas_usuario.md`  
 **Resultados:** `mvp/evidencia/resultados_okr.md`
 
@@ -146,5 +150,5 @@ Sin autenticación ni base de datos persistente. Las respuestas del usuario no s
 | Modelos entrenados y guardados (`models/`) | ✅ Listo |
 | App Streamlit (app.py) | ✅ Funcional |
 | Deploy en Streamlit Community Cloud | ✅ Activo — https://interviewiq-utec.streamlit.app/ |
-| Pruebas con ≥ 5 usuarios reales | ✅ Completado — 7 usuarios externos |
-| Resultados OKR finales | ✅ Completado — 3/3 KRs cumplidos |
+| Pruebas con ≥ 5 usuarios reales | ✅ Completado — 8 usuarios externos + 5 casos límite internos |
+| Resultados OKR finales | ✅ Medidos — KR1 y KR2 cumplidos; KR3 cerca de la meta (indirecto) |
