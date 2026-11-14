@@ -16,11 +16,12 @@
 
 | KR | Descripción | Meta PC1 | Pre (inicio) | Post (tras MVP) | Delta | Cumple |
 |----|-------------|----------|-------------|----------------|-------|--------|
-| KR1 | Reducir % de estudiantes que se sienten poco o nada preparados para entrevistas (baseline: 60%) | ≤ 40% | 71% (5/7) | **29%** (2/7) | −42 pp | ✅ |
-| KR2 | Reducir % con dificultad para estructurar respuestas conductuales (baseline: 80%) | ≤ 55% | 57% (4/7) | **29%** (2/7) | −28 pp | ✅ |
-| KR3 | Aumentar % que reciben feedback estructurado en al menos 1 sesión (baseline: 40%) | ≥ 90% | — | **100%** (7/7) | +60 pp | ✅ |
+| KR1 | Reducir % de estudiantes que se sienten poco o nada preparados para entrevistas (baseline: 60%) | ≤ 40% | 62.5% (5/8) | **25.0%** (2/8) | −37.5 pp | ✅ (indicativo) |
+| KR2 | Reducir % con dificultad para estructurar respuestas conductuales (baseline: 80%) | ≤ 55% | 33.3% (2/6) | **16.7%** (1/6) | −16.7 pp | ✅ (indicativo) |
+| KR3 | Aumentar % que reciben feedback estructurado en al menos 1 sesión (baseline: 40%) | ≥ 90% | 50.0% (4/8) | **87.5%** (7/8, indirecto) | +37.5 pp | ⚠️ Cerca de la meta, sin pregunta directa |
 
-**Muestra:** 7 usuarios externos al equipo · **Fecha:** 13 de Noviembre 2026 · **Instrumento:** Cuestionario pre/post vía Google Forms
+**Muestra:** 8 usuarios externos al equipo · **Fecha:** 13 de noviembre de 2026 · **Instrumento:** cuestionario pre/post vía Google Forms (escala 1–5)  
+**Cálculo:** KR1 = % con 1–2 en preparación (1 = nada preparado/a). KR2 = % con 1–2 en facilidad STAR (1 = muy difícil); n = 6 porque las 2 primeras respuestas usaron una versión del formulario sin la pregunta post. KR3: el formulario no incluyó "¿Recibiste feedback?"; se usa como indicador indirecto el % que calificó el feedback recibido. Detalle en `mvp/evidencia/resultados_okr.md`.
 
 ---
 
@@ -28,7 +29,7 @@
 
 **Tarea:** Clasificación multilabel independiente — 4 clasificadores binarios, uno por componente STAR.  
 **Modelo seleccionado:** TF-IDF bigramas + Linear SVM (CalibratedClassifierCV)  
-**Dataset:** `interviewiq_star_v1.csv` — 200 pares etiquetados (sintético + real)  
+**Dataset:** `interviewiq_star_v1.csv` — 200 pares etiquetados (100% sintéticos, generados y etiquetados por el equipo)  
 **Split:** 70% entrenamiento / 10% validación / 20% prueba  
 **Vectorizador:** TF-IDF, bigramas, max_features=5000, sublinear_tf=True
 
@@ -41,6 +42,8 @@
 | A — Acción | **0.804** | 1 (9.1%) | 6 | 0.75 | ✅ CUMPLE |
 | R — Resultado | **0.829** | 2 (7.7%) | 4 | 0.50 | ✅ CUMPLE |
 | **PROMEDIO** | **0.830** | — | — | — | ✅ CUMPLE |
+
+> ⚠️ Los F1, FP y FN de esta tabla se calcularon con el umbral de R en 0.70. El umbral vigente en la app es 0.50 (ajustado tras el caso límite C5 de las pruebas internas); el F1 de R y el promedio deben recalcularse en el notebook con ese umbral.
 
 #### Comparación baseline vs modelo final
 
@@ -80,11 +83,11 @@ Se evaluó cada umbral de 0.05 a 0.95 en el set de validación y se eligió el q
 
 | Métrica | Meta PC1 | Resultado | Cumple |
 |---------|----------|-----------|--------|
-| Feedback coherente con output A2 (Patrón 1 activo) | Siempre | ✅ G1 siempre recibe output de A2 antes de generar feedback | ✅ |
-| Latencia de respuesta | < 5 seg | ✅ ~1–3 seg (Gemini) / ~0.5 seg (fallback) | ✅ |
+| Feedback coherente con output A2 (Patrón 1 activo) | ≥ 90% en 20 casos | Por diseño, G1 siempre recibe el output de A2 en el prompt. Medición en 20 casos: __% | ⏳ Pendiente |
+| Latencia de respuesta | < 5 seg | Observada en la demo; no se midió formalmente | ⚠️ No medido |
 | Disponibilidad sin API key | Fallback disponible | ✅ Reglas estructuradas activas cuando no hay GEMINI_API_KEY | ✅ |
 
-> **Decisión documentada:** El MVP usa Gemini 2.5 Flash como componente generativo principal, con fallback automático a reglas estructuradas. El RAG completo y la Etapa 1 (clasificador de nivel de preparación) quedaron fuera del MVP actual y están documentados como deuda técnica en `plantillas/plantilla_3_technical_decisions.md`.
+> **Decisión documentada:** El MVP usa Gemini 2.5 Flash como componente generativo principal, con fallback automático a reglas estructuradas. El RAG completo y la Etapa 1 (clasificador de nivel de preparación) quedaron fuera del MVP actual y están documentados en la Plantilla 3 (nota de versión final) y como deuda técnica en la sección B5 de esta plantilla.
 
 ---
 
@@ -96,7 +99,7 @@ Se evaluó cada umbral de 0.05 a 0.95 en el set de validación y se eligió el q
 
 | # | Riesgo | Probabilidad | Impacto | Nivel | Mitigación concreta |
 |---|--------|-------------|---------|-------|---------------------|
-| R1 | El modelo clasifica incorrectamente un componente STAR como presente cuando no lo está (Falso Positivo) | Alta (S: 25%, T: 33%) | Alto | 🔴 Crítico | Ajuste de umbrales por componente en validación. Se muestra la probabilidad numérica al usuario para que evalúe. Umbrales conservadores en A (0.75) y R (0.70). |
+| R1 | El modelo clasifica incorrectamente un componente STAR como presente cuando no lo está (Falso Positivo) | Alta (S: 25%, T: 33%) | Alto | 🔴 Crítico | Ajuste de umbrales por componente en validación. Se muestra la probabilidad numérica al usuario para que evalúe. Umbral conservador en A (0.75); R en 0.50 tras pruebas internas (caso límite C5). La app además avisa cuando la respuesta es hipotética ("yo haría…"), que fue el falso positivo más grave encontrado. |
 | R2 | Dataset sintético no representa la variedad real de respuestas (sesgo de distribución) | Media | Alto | 🟡 Moderado | 200 ejemplos son el punto de partida. Las pruebas de usuario (≥5 personas reales) validan el comportamiento con texto real. Se planifica re-entrenamiento post-lanzamiento con datos reales. |
 | R3 | Degradación del modelo en respuestas muy cortas (< 15 palabras) | Alta | Medio | 🟡 Moderado | La app advierte al usuario si la respuesta es muy corta. El modelo muestra confianza baja en estos casos. |
 | R4 | Respuestas en otro idioma o con mucho argot degradan la clasificación | Media | Bajo | 🟢 Bajo | El modelo fue entrenado solo en español. La interfaz indica que la respuesta debe ser en español. |
@@ -133,7 +136,7 @@ InterviewIQ procesa respuestas de texto libre que pueden contener información p
 
 | Obligación legal | Implementación en InterviewIQ |
 |-----------------|-------------------------------|
-| Consentimiento informado (Art. 13) | La app muestra aviso visible antes del análisis: *"Tus respuestas se procesan para darte feedback. No se almacenan."* |
+| Consentimiento informado (Art. 13) | La app muestra un aviso visible antes del análisis: *"Privacidad (Ley N.° 29733): tu respuesta se usa solo en esta sesión; evita datos personales."* En las pruebas con usuarios, el formulario fue anónimo y no recolectó nombres, correos ni DNI. |
 | Finalidad específica (Art. 8) | Los datos se usan exclusivamente para clasificación STAR y generación de feedback. No se usan para entrenamiento ni se envían a terceros más allá de Gemini API (propósito declarado). |
 | No almacenamiento sin consentimiento | El MVP no persiste respuestas del usuario. Streamlit no guarda texto entre sesiones. No hay base de datos. |
 | Seguridad (Art. 16) | La comunicación es HTTPS (Streamlit Community Cloud). Las llamadas a Gemini API también son HTTPS. No hay base de datos con datos personales. |
@@ -141,8 +144,9 @@ InterviewIQ procesa respuestas de texto libre que pueden contener información p
 #### Declaración de transparencia del MVP
 
 El MVP informa visiblemente al usuario que está interactuando con IA mediante:
-- Encabezado de la app: *"InterviewIQ — Análisis con IA"*
-- Disclaimer en la sección de feedback: *"Este análisis es generado automáticamente por IA entrenada con datos sintéticos."*
+- Landing: *"…y recibe análisis con IA en segundos."*
+- Aviso visible en la pantalla de análisis: *"Herramienta de práctica — puede equivocarse y no predice resultados en entrevistas reales."*
+- El feedback indica si fue generado por Google Gemini o por reglas.
 - El score STAR muestra la probabilidad numérica de cada componente, no solo la clasificación binaria.
 
 ---
@@ -154,7 +158,7 @@ El MVP informa visiblemente al usuario que está interactuando con IA mediante:
 | El modelo dice que falta Situación, pero sí estaba presente (FN) | El estudiante recibe feedback innecesario sobre cómo añadir contexto | El feedback de FN es constructivo y no dañino. En el peor caso el estudiante aprende algo extra sobre estructura STAR. |
 | El modelo dice que la Acción está presente, pero no lo estaba (FP) | El estudiante no recibe el consejo correcto sobre qué mejorar | Se minimiza con umbral 0.75 para Acción. Las probabilidades se muestran para que el usuario las evalúe. |
 | Gemini genera feedback incorrecto o incoherente | El estudiante recibe orientación errónea | El prompt incluye los componentes detectados por A2 como restricción. Si la respuesta de Gemini falla, el fallback a reglas garantiza feedback consistente. |
-| El MVP no está disponible el día de la sustentación | El evaluador no puede acceder | Deploy en Streamlit Community Cloud (SLA 99.9%). Se tiene screenshot de demostración como respaldo. |
+| El MVP no está disponible el día de la sustentación | El evaluador no puede acceder | Deploy en Streamlit Community Cloud (plan gratuito, sin SLA garantizado). Se abre la app antes de la sustentación para "despertarla" y se tiene un video/capturas de la demo como respaldo. |
 
 ---
 
