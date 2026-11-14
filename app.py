@@ -516,7 +516,7 @@ st.markdown("""
   <div class="iq-nav-logo">Interview<span>IQ</span></div>
   <div class="iq-nav-pills">
     <span class="iq-pill p">AD5018 · UTEC</span>
-    <span class="iq-pill g">F1 = 0.830 ✓</span>
+    <span class="iq-pill g">F1 = 0.808 ✓</span>
     <span class="iq-pill y">⚡ IA + STAR</span>
   </div>
 </div>""", unsafe_allow_html=True)
@@ -536,7 +536,7 @@ if st.session_state.pagina == "landing":
             y recibe análisis con IA en segundos.
           </div>
           <div class="iq-stats">
-            <div class="iq-stat"><div class="iq-stat-n">0.830</div><div class="iq-stat-l">F1 Macro</div></div>
+            <div class="iq-stat"><div class="iq-stat-n">0.808</div><div class="iq-stat-l">F1 Macro</div></div>
             <div class="iq-stat"><div class="iq-stat-n">4</div><div class="iq-stat-l">Componentes</div></div>
             <div class="iq-stat"><div class="iq-stat-n">200</div><div class="iq-stat-l">Respuestas</div></div>
             <div class="iq-stat"><div class="iq-stat-n">~5s</div><div class="iq-stat-l">Feedback</div></div>
@@ -591,7 +591,7 @@ if st.session_state.pagina == "landing":
         </div>
         <div class="iq-row">
           <div class="iq-num">4</div>
-          <div><span class="iq-row-ttl">Feedback con Gemini</span>
+          <div><span class="iq-row-ttl">Feedback con reglas</span>
                <span class="iq-row-sub">Recomendaciones concretas basadas en tu respuesta.</span></div>
         </div>
       </div>
