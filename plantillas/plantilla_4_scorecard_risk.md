@@ -43,7 +43,7 @@
 | R — Resultado | **0.829** | 2 (7.7%) | 4 | 0.50 | ✅ CUMPLE |
 | **PROMEDIO** | **0.808** | — | — | — | ✅ CUMPLE |
 
-> ⚠️ Los F1, FP y FN de esta tabla se calcularon con el umbral de R en 0.70. El umbral vigente en la app es 0.50 (ajustado tras el caso límite C5 de las pruebas internas); el F1 de R y el promedio deben recalcularse en el notebook con ese umbral.
+> ⚠️ Los F1 de esta tabla se calcularon con el umbral de Resultado ajustado a 0.50 (vigente en la app).
 
 #### Comparación baseline vs modelo final
 
