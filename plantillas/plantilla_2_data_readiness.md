@@ -14,7 +14,7 @@
 **Proyecto:** InterviewIQ — Simulador Inteligente de Entrevistas para Universitarios
 **Tipo de IA del proyecto:** A2 (clasificación multilabel STAR) + G1 (Gemini 2.5 Flash)
 
-> **Nota de versión final (PC2 — Semana 14):** Esta plantilla corresponde al diseño original (PC1). En el MVP implementado: (1) el **Recurso 1** (cuestionario diagnóstico para clasificador de nivel — Etapa 1) no se usó para entrenamiento porque la Etapa 1 quedó fuera del alcance del MVP; el cuestionario se reutilizó como instrumento de medición de OKRs (pre/post); (2) el **Recurso 3** (corpus RAG) no se implementó porque el componente generativo bajó de G2 a G1 — Gemini 2.5 Flash recibe directamente la salida del clasificador STAR sin recuperación de documentos; (3) el **Recurso 2** (`interviewiq_star_v1.csv`, 200 filas) se construyó y usó para entrenar los 4 clasificadores binarios STAR (F1 promedio = 0.830).
+> **Nota de versión final (PC2 — Semana 14):** Esta plantilla corresponde al diseño original (PC1). En el MVP implementado: (1) el **Recurso 1** (cuestionario diagnóstico para clasificador de nivel — Etapa 1) no se usó para entrenamiento porque la Etapa 1 quedó fuera del alcance del MVP; el cuestionario se reutilizó como instrumento de medición de OKRs (pre/post); (2) el **Recurso 3** (corpus RAG) no se implementó porque el componente generativo bajó de G2 a G1 — Gemini 2.5 Flash recibe directamente la salida del clasificador STAR sin recuperación de documentos; (3) el **Recurso 2** (`interviewiq_star_v1.csv`, 200 filas) se construyó y usó para entrenar los 4 clasificadores binarios STAR (F1 promedio = 0.808).
 
 ---
 
@@ -115,7 +115,7 @@ etiquetas. Por ejemplo: S=1, T=1, A=1, R=0.
 | Action (A) | ✅ Dataset construido — `interviewiq_star_v1.csv`, 200 filas |
 | Result (R) | ✅ Dataset construido — `interviewiq_star_v1.csv`, 200 filas |
 
-**Estado PC2:** dataset construido con 200 pares etiquetados (sintético + real). Split: 70/10/20. F1 Macro promedio final = 0.830.
+**Estado PC2:** dataset construido con 200 pares etiquetados (sintético + real). Split: 70/10/20. F1 Macro promedio final = 0.808.
 
 **Revisión de fuga de datos** *(obligatoria)*:
 
