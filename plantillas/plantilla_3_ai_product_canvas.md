@@ -98,7 +98,7 @@ Output: feedback personalizado
 | **Dataset de entrenamiento** | Recurso 2 — InterviewIQ-STAR (200 pares etiquetados) |
 | **Split** | 70% entrenamiento / 10% validación / 20% test |
 | **Métrica principal** | Macro F1 (promedia las 4 etiquetas con igual peso) |
-| **Resultado obtenido** | **F1 promedio = 0.830** ✅ (supera criterio mínimo) |
+| **Resultado obtenido** | **F1 promedio = 0.808** ✅ (supera criterio mínimo) |
 | **Criterio mínimo de aceptación** | Macro F1 ≥ 0.65 sobre el conjunto de test |
 | **Umbrales calibrados por etiqueta** | situacion=0.30, tarea=0.30, accion=0.75, resultado=0.50 |
 | **Costo del error** | **Falso positivo más costoso:** indicar que un componente STAR está presente cuando no lo está significa decirle al estudiante que su respuesta es buena cuando no lo es. Los umbrales se ajustaron por etiqueta priorizando reducir falsos positivos. |
@@ -181,7 +181,7 @@ Incrementar la preparación percibida y la capacidad de estructurar respuestas c
 
 | Componente | Métrica | Criterio mínimo | Resultado |
 |---|---|---|---|
-| Clasificador STAR A2 | Macro F1 en test | ≥ 0.65 | **0.830** ✅ |
+| Clasificador STAR A2 | Macro F1 en test | ≥ 0.65 | **0.808** ✅ |
 | G1 Gemini 2.5 Flash | Coherencia de feedback con predicciones A2 | Fallback funcional | ✅ Implementado con fallback |
 | Clasificador Etapa 1 | Accuracy en test | ≥ 0.65 | ❌ No implementado |
 | Pipeline RAG G2 | Retrieval precision@k | ≥ 0.80 | ❌ No implementado |
@@ -231,7 +231,7 @@ Incrementar la preparación percibida y la capacidad de estructurar respuestas c
               │       (A2)          │
               │  TF-IDF bigramas +  │
               │  LinearSVC + Calib. │
-              │  F1 promedio=0.830  │
+              │  F1 promedio=0.808  │
               │  Output: S,T,A,R   │
               └──────────┬──────────┘
                          │  predicciones + respuesta original
@@ -267,7 +267,7 @@ Incrementar la preparación percibida y la capacidad de estructurar respuestas c
 | Pregunta de control | Respuesta |
 |---|---|
 | ¿El flujo del MVP implementado está descrito (pregunta → respuesta → STAR → G1 → feedback)? | **SÍ** |
-| ¿El componente analítico A2 (clasificador STAR) está documentado con inputs, outputs, algoritmo y resultado F1? | **SÍ — F1=0.830** |
+| ¿El componente analítico A2 (clasificador STAR) está documentado con inputs, outputs, algoritmo y resultado F1? | **SÍ — F1=0.808** |
 | ¿El componente generativo G1 (Gemini) depende de la salida de A2 y tiene fallback documentado? | **SÍ** |
 | ¿El patrón de conexión (Modelo → Lenguaje) está justificado? | **SÍ** |
 | ¿Los OKRs tienen baseline, meta y resultado real (n=7)? | **SÍ — 3/3 KRs cumplidos** |
