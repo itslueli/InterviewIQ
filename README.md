@@ -116,7 +116,7 @@ id, pregunta, respuesta, situacion, tarea, accion, resultado, fuente
 |----|----------|------|----------------------|--------|
 | KR1 — Estudiantes poco/nada preparados para entrevistas | 60% | ≤ 40% | **62.5% → 25%** | ✅ Cumplido |
 | KR2 — Estudiantes con dificultad para estructurar respuestas STAR | 80% | ≤ 55% | **37.5% → 25%** | ✅ Cumplido |
-| KR3 — Estudiantes que rara vez reciben feedback estructurado | 40% | ≥ 90% reciben ≥ 1 sesión | **87.5%** (7/8 recibieron feedback) | ✅ Cumplido |
+| KR3 — Estudiantes que rara vez reciben feedback estructurado | 40% | ≥ 90% reciben ≥ 1 sesión | **87.5%** (7/8, indirecto) | ⚠️ Cerca de la meta |
 
 Medición: cuestionario pre/post aplicado a 8 usuarios externos al equipo. Los 3 KRs fueron cumplidos.
 
