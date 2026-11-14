@@ -86,7 +86,7 @@ Split: 70% entrenamiento / 10% validación / 20% prueba.
 | T — Tarea | 0.874 | **0.822** | 0.30 | ✅ CUMPLE |
 | A — Acción | 0.881 | **0.804** | 0.75 | ✅ CUMPLE |
 | R — Resultado | 0.774 | **0.829** | 0.50* | ✅ CUMPLE |
-| **Promedio** | 0.842 | **0.830** | — | ✅ CUMPLE |
+| **Promedio** | 0.842 | **0.808** | — | ✅ CUMPLE |
 
 > \* El F1 de R se calculó con umbral 0.70; el umbral vigente es 0.50 (ajustado tras pruebas internas). Recalcular en el notebook.
 
