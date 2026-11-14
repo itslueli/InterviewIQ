@@ -270,7 +270,7 @@ Incrementar la preparación percibida y la capacidad de estructurar respuestas c
 | ¿El componente analítico A2 (clasificador STAR) está documentado con inputs, outputs, algoritmo y resultado F1? | **SÍ — F1=0.808** |
 | ¿El componente generativo G1 (Gemini) depende de la salida de A2 y tiene fallback documentado? | **SÍ** |
 | ¿El patrón de conexión (Modelo → Lenguaje) está justificado? | **SÍ** |
-| ¿Los OKRs tienen baseline, meta y resultado real (n=7)? | **SÍ — 3/3 KRs cumplidos** |
+| ¿Los OKRs tienen baseline, meta y resultado real (n=8)? | **SÍ — 3/3 KRs cumplidos** |
 | ¿El alcance del MVP está delimitado con lo implementado y lo que quedó fuera? | **SÍ** |
 | ¿Los riesgos críticos tienen mitigaciones concretas? | **SÍ** |
 | ¿El stack refleja lo que se desplegó (Gemini, no GPT-4o-mini; sin FAISS/ChromaDB)? | **SÍ** |
