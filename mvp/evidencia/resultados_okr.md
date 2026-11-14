@@ -5,6 +5,7 @@
 **Curso:** AD5018 — Inteligencia Artificial para Negocios · UTEC 2026-2  
 **Equipo:** Valeria Briceño · Lucía Rodríguez · Jennifer Patiño · Aaron Van Oord  
 **MVP URL:** https://interviewiq-utec.streamlit.app/  
+**Fecha de medición:** 13 de noviembre de 2026
 
 ---
 
@@ -22,19 +23,35 @@
 
 ## Resultados reales (pruebas con usuarios externos)
 
-> Escala de preparación: 1 = Nada preparado/a · 5 = Muy preparado/a  
-> Escala de dificultad STAR: 1 = Nada difícil · 5 = Muy difícil  
-> KR1 y KR2: valores 1-2 = "poco/nada preparado" o "con dificultad"
+Detalle por usuario y protocolo en `mvp/evidencia/pruebas_usuario.md`.
 
-| KR | Baseline | Meta | Pre-MVP | Post-MVP | Resultado | Cumple |
-|----|----------|------|---------|----------|-----------|--------|
-| KR1 | 60% | ≤ 40% | **71%** (5/7 con valor ≤ 2) | **29%** (2/7 con valor ≤ 2) | 71% → 29% | ✅ |
-| KR2 | 80% | ≤ 55% | **57%** (4/7 con valor ≥ 4) | **29%** (2/7 con valor ≥ 4) | 57% → 29% | ✅ |
-| KR3 | 40% | ≥ 90% | — | **100%** (7/7 recibieron feedback) | 100% | ✅ |
+| KR | Baseline PC1 | Meta | Antes de usar la app | Después de usar la app | Cumple |
+|----|----------|------|---------------|--------|--------|
+| KR1 | 60% | ≤ 40% | 62.5% (5/8) | **25.0% (2/8)** | ✅ (indicativo) |
+| KR2 | 80% | ≤ 55% | 33.3% (2/6) | **16.7% (1/6)** | ✅ (indicativo) |
+| KR3 | 40% | ≥ 90% | 50.0% (4/8) | **87.5% (7/8)**, medido de forma indirecta | ⚠️ Cerca de la meta, sin pregunta directa |
 
-**Muestra:** 7 usuarios externos al equipo  
-**Período de prueba:** 13 de noviembre de 2026  
-**Instrumento:** Cuestionario pre/post (preguntas 1-3 pre, preguntas 5-6 post)
+**Muestra:** 8 estudiantes universitarios externos al equipo (meta: ≥ 5)  
+**Período de prueba:** 13 de noviembre de 2026, de 16:29 a 18:03  
+**Instrumento:** Google Form anónimo con preguntas antes y después del uso de la app (escala 1–5)
+
+**Cómo se calculó cada KR**
+- **KR1:** % que marca 1 o 2 en "¿Qué tan preparado/a te sientes para una entrevista laboral por competencias?" (1 = nada preparado/a), antes (pregunta 1) y después (pregunta 5).
+- **KR2:** % que marca 1 o 2 en "¿Qué tan difícil te resulta estructurar tus respuestas en formato STAR?" (1 = muy difícil), antes (pregunta 2) y después (pregunta 6). Se usan los 6 usuarios que respondieron ambas, porque las 2 primeras respuestas se recogieron con una versión del formulario que no tenía la pregunta 6. Con los 8 usuarios, el "antes" es 50%.
+- **KR3:** antes = % que recibe feedback estructurado "a veces" o más (3 a 5 en la pregunta 3). Después: el formulario no incluyó la pregunta directa "¿Recibiste feedback?". Como indicador indirecto, 7 de 8 usuarios calificaron el feedback que recibieron (todos "Muy útil") y 1 dejó la pregunta en blanco.
+
+---
+
+## Indicadores complementarios de uso
+
+| Indicador | Resultado |
+|-----------|-----------|
+| Preparación promedio (1–5), antes → después | 2.6 → 3.6 |
+| Usuarios que mejoraron / se mantuvieron / empeoraron en preparación | 5 / 3 / 0 |
+| Facilidad STAR promedio (1–5), antes → después (n = 6) | 3.0 → 3.7 |
+| Completaron la tarea sin ayuda | 83% (5/6) |
+| Facilidad para entender el análisis STAR (1–5) | 3.6 |
+| ¿La usarían para una entrevista real? | 8/8 "Definitivamente sí" |
 
 ---
 
@@ -48,20 +65,36 @@
 | F1 componente A — Acción | ≥ 0.65 | **0.804** | ✅ |
 | F1 componente R — Resultado | ≥ 0.65 | **0.829** | ✅ |
 | MVP con URL pública | Sí | https://interviewiq-utec.streamlit.app/ | ✅ |
-| Feedback coherente con output A2 (Patrón 1) | Siempre | G1 siempre recibe output de A2 | ✅ |
+| Feedback coherente con el output de A2 (patrón 1: modelo → lenguaje) | ≥ 90% en 20 casos | __% *(prueba de Jennifer)* | ⏳ |
+
+> ⚠️ Los F1 se calcularon con el umbral de Resultado en 0.70. El umbral vigente en la app es 0.50; el F1 de R y el F1 promedio deben **recalcularse en el notebook** con ese umbral antes de la entrega.
+
+> La capa de lenguaje es **G1** (LLM con contexto fijo, Google Gemini). El equipo bajó formalmente de G2 (RAG) a G1; ver Plantilla 3.
 
 ---
 
 ## Análisis
 
 **¿Qué funcionó?**  
-El flujo completo fue completado de forma autónoma por 6 de 7 usuarios sin necesitar explicación. El feedback de Gemini fue calificado como "Muy útil" por todos los usuarios que respondieron esa pregunta. El 100% indicó que usaría la herramienta para prepararse para una entrevista real.
+- El MVP cumple el ciclo completo con usuarios reales: 8 estudiantes externos lo usaron desde su propio dispositivo y 5 de los 6 consultados lo usaron sin ayuda.
+- KR1 y KR2 superan la meta: después de una sesión, el % de estudiantes que se sienten poco o nada preparados bajó de 62.5% a 25%, y ningún usuario reportó sentirse menos preparado.
+- El clasificador STAR supera la meta técnica en los 4 componentes, y el feedback fue valorado como "Muy útil" por todos los que respondieron.
 
 **¿Qué no alcanzó la meta?**  
-Todos los KRs fueron cumplidos. Un usuario indicó que necesitó ayuda para usar la app.
+- **KR3 no se midió de forma directa** porque el formulario no incluyó la pregunta "¿Recibiste feedback?". La evidencia indirecta (87.5%) está cerca, pero no basta para decir que se cumple la meta de ≥ 90%.
+- La **comprensión del análisis STAR** es el punto más débil (3.6/5): las tarjetas muestran valores técnicos (probabilidad y umbral) que un estudiante no sabe interpretar.
+- Un usuario (U06) reportó que estructurar STAR le resulta más difícil después de usar la app (de 4 a 2).
+
+**Limitaciones de la medición**  
+- n = 8, muestra por conveniencia (contactos del equipo), con posible sesgo de complacencia: 8/8 respondieron "Definitivamente sí" en una pregunta de solo 2 opciones. El resultado es **indicativo, no estadísticamente concluyente**.
+- La muestra tenía menos dificultad inicial que la encuesta de PC1 en KR2 (50% vs. 80%). Parte del cumplimiento se explica por la muestra, no solo por la app.
+- Es una medición inmediata y autorreportada: no muestra si el estudiante rinde mejor en una entrevista real.
 
 **¿Qué cambiaría el equipo si tuviera más tiempo?**  
-Según comentarios de usuarios: añadir más variedad de colores en la interfaz y ampliar el banco de preguntas por rol.
+- Repetir la prueba con 15 o más usuarios no conocidos, con la pregunta directa de KR3, escalas de 1 a 5 en todas las preguntas, y una pregunta sobre en qué necesitaron ayuda.
+- Reemplazar los valores técnicos de las tarjetas STAR por explicaciones simples.
+- Ampliar el dataset con más ejemplos de "Resultado" (solo 38% de las respuestas tienen R = 1) para corregir los falsos negativos con resultados cortos.
+- Recuperar la Etapa 1 (cuestionario diagnóstico y nivel) y el RAG (G2), que quedaron fuera del MVP.
 
 ---
 
@@ -69,7 +102,8 @@ Según comentarios de usuarios: añadir más variedad de colores en la interfaz 
 
 | Evidencia | Ubicación |
 |-----------|-----------|
-| Registro de pruebas de usuario (7 usuarios) | `mvp/evidencia/pruebas_usuario.md` |
+| Registro de pruebas de usuario (8 usuarios + 5 casos límite) | `mvp/evidencia/pruebas_usuario.md` |
 | Métricas del clasificador STAR | `plantillas/plantilla_4_scorecard_risk.md` |
-| Notebook de entrenamiento | `notebooks/02_modelo_svm.ipynb` |
+| Notebook de entrenamiento | `notebooks/` |
 | URL del MVP | https://interviewiq-utec.streamlit.app/ |
+| Respuestas del formulario (CSV anónimo) | Disponible para el evaluador si lo solicita |
