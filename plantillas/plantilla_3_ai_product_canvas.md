@@ -173,7 +173,7 @@ Incrementar la preparación percibida y la capacidad de estructurar respuestas c
 |---|---|---|---|---|---|
 | **KR1** | % que se sienten poco o nada preparados | **60%** | ≤ 40% | **62.5% → 25%** (pre/post) | ✅ Cumplido |
 | **KR2** | % con dificultad para estructurar respuestas STAR | **80%** | ≤ 55% | **37.5% → 25%** (pre/post) | ✅ Cumplido |
-| **KR3** | % que nunca reciben feedback estructurado | **40%** | ≥ 90% reciben ≥ 1 sesión | **87.5%** (7/8 recibieron feedback) | ✅ Cumplido |
+| **KR3** | % que nunca reciben feedback estructurado | **40%** | ≥ 90% reciben ≥ 1 sesión | **87.5%** (7/8, indirecto) | ⚠️ Cerca de la meta|
 
 > Medición aplicada con cuestionario pre/post a 8 usuarios externos al equipo (n=8). Los 3 KRs fueron cumplidos.
 
