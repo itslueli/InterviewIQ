@@ -7,11 +7,14 @@
 **Equipo:**
 - Integrante 1: Valeria Briceño
 - Integrante 2: Lucía Rodríguez
-- Integrante 3: Aaron Van Oord
+- Integrante 3: Jennifer Patiño
+- Integrante 4: Aaron Van Oord
 
 
 **Proyecto:** InterviewIQ — Simulador Inteligente de Entrevistas para Universitarios
-**Tipo de IA del proyecto:** A2 (diagnóstico de nivel + clasificación multilabel STAR) + G2 (RAG)
+**Tipo de IA del proyecto:** A2 (clasificación multilabel STAR) + G1 (Gemini 2.5 Flash)
+
+> **Nota de versión final (PC2 — Semana 14):** Esta plantilla corresponde al diseño original (PC1). En el MVP implementado: (1) el **Recurso 1** (cuestionario diagnóstico para clasificador de nivel — Etapa 1) no se usó para entrenamiento porque la Etapa 1 quedó fuera del alcance del MVP; el cuestionario se reutilizó como instrumento de medición de OKRs (pre/post); (2) el **Recurso 3** (corpus RAG) no se implementó porque el componente generativo bajó de G2 a G1 — Gemini 2.5 Flash recibe directamente la salida del clasificador STAR sin recuperación de documentos; (3) el **Recurso 2** (`interviewiq_star_v1.csv`, 200 filas) se construyó y usó para entrenar los 4 clasificadores binarios STAR (F1 promedio = 0.830).
 
 ---
 
@@ -58,7 +61,7 @@ RECURSO 3 — Corpus RAG
 nivel_preparacion ∈ {básico, intermedio, avanzado}
 ```
 
-**Estado actual:** 🟡 — cuestionario diseñado, recolección pendiente. Se aplicará en sesiones piloto (Semana 7) y a ≥ 15 usuarios externos (Semana 13).
+**Estado actual PC2:** 🟢 — cuestionario aplicado a 7 usuarios externos como instrumento pre/post para medición de OKRs. La Etapa 1 (clasificador de nivel) quedó fuera del MVP; los datos del cuestionario no se usaron para entrenar un modelo, sino para medir KR1 y KR2.
 
 ---
 
@@ -107,12 +110,12 @@ etiquetas. Por ejemplo: S=1, T=1, A=1, R=0.
 
 | Categoría que se quiere distinguir | N° de casos disponibles |
 |---|---|
-| Situation (S) | Pendiente — dataset aún no construido |
-| Task (T) | Pendiente — dataset aún no construido |
-| Action (A) | Pendiente — dataset aún no construido |
-| Result (R) | Pendiente — dataset aún no construido |
+| Situation (S) | ✅ Dataset construido — `interviewiq_star_v1.csv`, 200 filas |
+| Task (T) | ✅ Dataset construido — `interviewiq_star_v1.csv`, 200 filas |
+| Action (A) | ✅ Dataset construido — `interviewiq_star_v1.csv`, 200 filas |
+| Result (R) | ✅ Dataset construido — `interviewiq_star_v1.csv`, 200 filas |
 
-Actualmente **no existe un conteo verificable** porque el dataset todavía no ha sido construido y etiquetado. El equipo verificará que las respuestas incluyan combinaciones completas (S=1,T=1,A=1,R=1), parciales y deficientes para asegurar que cada etiqueta tenga representación suficiente antes de hacer el split de entrenamiento, validación y prueba.
+**Estado PC2:** dataset construido con 200 pares etiquetados (sintético + real). Split: 70/10/20. F1 Macro promedio final = 0.830.
 
 **Revisión de fuga de datos** *(obligatoria)*:
 
@@ -142,8 +145,8 @@ El split se diseñará agrupando por pregunta o plantilla de origen para evitar 
 | 5 | Ocupaciones y competencias para contextualizar preguntas según rol objetivo | ESCO — Comisión Europea | Portal web / CSV / ODS / RDF / API | SÍ |
 
 **Estrategia de contexto elegida:**
-- [ ] **G1** Prompt simple *(base de conocimiento pequeña y estable)*
-- [x] **G2** RAG *(base de conocimiento grande o cambiante)*
+- [x] **G1** Prompt simple *(implementado en MVP: Gemini 2.5 Flash vía API REST — el corpus RAG no se implementó)*
+- [ ] **G2** RAG *(planeado en PC1; quedó fuera del MVP como deuda técnica)*
 - [ ] **G3/G4** Agente con herramientas
 - [ ] Memoria de sesión
 
@@ -288,9 +291,9 @@ Las respuestas reales de usuarios no se publicarán en el repositorio. La carpet
 
 ### Conclusión de readiness
 
-**Estado general: 🟡 Amarillo — viable, pero todavía no listo para entrenamiento.**
+**Estado general PC2: 🟢 Verde — R2 construido y usado para entrenar los modelos.**
 
-El recurso R3 (corpus RAG) está en el mejor estado: fuentes verificadas y accesibles. El recurso R1 (cuestionario diagnóstico) tiene diseño definido pero recolección pendiente. El recurso R2 (dataset `InterviewIQ-STAR`) es el principal bloqueante para PC2: tiene diseño definido pero construcción y etiquetado pendientes.
+El recurso R2 (`interviewiq_star_v1.csv`, 200 filas) fue construido y usado para entrenar los 4 clasificadores STAR. El recurso R1 fue reutilizado como instrumento pre/post para medir OKRs (n=7 usuarios). El recurso R3 (corpus RAG) no se implementó: el componente generativo bajó de G2 a G1 (Gemini 2.5 Flash con prompt directo).
 
 ---
 
