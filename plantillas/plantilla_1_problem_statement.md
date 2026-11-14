@@ -69,7 +69,7 @@ El modelo principal identificará la presencia o ausencia de los componentes **S
 
 **Nivel de profundidad elegido:**
 - [ ] **A1**
-- [x] **A2** — compara modelos y ajusta el umbral según el costo del error *(implementado: TF-IDF bigramas + Linear SVM con CalibratedClassifierCV; F1 promedio = 0.830)*
+- [x] **A2** — compara modelos y ajusta el umbral según el costo del error *(implementado: TF-IDF bigramas + Linear SVM con CalibratedClassifierCV; F1 promedio = 0.808)*
 - [ ] **A3**
 
 **Compromiso A2:** se entrenará un baseline y al menos un modelo alternativo para la detección STAR. Se compararán con métricas adecuadas y se justificará el umbral considerando el costo de falsos positivos y falsos negativos.
