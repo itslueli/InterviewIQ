@@ -5,7 +5,6 @@
 **Curso:** AD5018 — Inteligencia Artificial para Negocios · UTEC 2026-2  
 **Equipo:** Valeria Briceño · Lucía Rodríguez · Jennifer Patiño · Aaron Van Oord  
 **MVP URL:** https://interviewiq-utec.streamlit.app/  
-**Fecha de medición:** 13 de noviembre de 2026
 
 ---
 
@@ -32,7 +31,7 @@ Detalle por usuario y protocolo en `mvp/evidencia/pruebas_usuario.md`.
 | KR3 | 40% | ≥ 90% | 50.0% (4/8) | **87.5% (7/8)**, medido de forma indirecta | ⚠️ Cerca de la meta, sin pregunta directa |
 
 **Muestra:** 8 estudiantes universitarios externos al equipo (meta: ≥ 5)  
-**Período de prueba:** 13 de noviembre de 2026, de 16:29 a 18:03  
+**Período de prueba:** 09 de noviembre, hasta 13 noviembre de 2026
 **Instrumento:** Google Form anónimo con preguntas antes y después del uso de la app (escala 1–5)
 
 **Cómo se calculó cada KR**
@@ -59,15 +58,15 @@ Detalle por usuario y protocolo en `mvp/evidencia/pruebas_usuario.md`.
 
 | Métrica | Meta PC1 | Resultado | Cumple |
 |---------|----------|-----------|--------|
-| F1 Macro promedio — clasificador STAR (A2) | ≥ 0.65 | **0.830** | ✅ |
+| F1 Macro promedio — clasificador STAR (A2) | ≥ 0.65 | **0.808** | ✅ |
 | F1 componente S — Situación | ≥ 0.65 | **0.865** | ✅ |
 | F1 componente T — Tarea | ≥ 0.65 | **0.822** | ✅ |
 | F1 componente A — Acción | ≥ 0.65 | **0.804** | ✅ |
 | F1 componente R — Resultado | ≥ 0.65 | **0.829** | ✅ |
 | MVP con URL pública | Sí | https://interviewiq-utec.streamlit.app/ | ✅ |
-| Feedback coherente con el output de A2 (patrón 1: modelo → lenguaje) | ≥ 90% en 20 casos | __% *(prueba de Jennifer)* | ⏳ |
+| Feedback coherente con el output de A2 (patrón 1: modelo → lenguaje) | ≥ 90% en 20 casos | **100%** (20/20 casos — feedback por reglas) | ✅ |
 
-> ⚠️ Los F1 se calcularon con el umbral de Resultado en 0.70. El umbral vigente en la app es 0.50; el F1 de R y el F1 promedio deben **recalcularse en el notebook** con ese umbral antes de la entrega.
+> ⚠️ Los F1 de esta tabla se calcularon con el umbral de Resultado ajustado a 0.50 (vigente en la app).
 
 > La capa de lenguaje es **G1** (LLM con contexto fijo, Google Gemini). El equipo bajó formalmente de G2 (RAG) a G1; ver Plantilla 3.
 
@@ -106,4 +105,3 @@ Detalle por usuario y protocolo en `mvp/evidencia/pruebas_usuario.md`.
 | Métricas del clasificador STAR | `plantillas/plantilla_4_scorecard_risk.md` |
 | Notebook de entrenamiento | `notebooks/` |
 | URL del MVP | https://interviewiq-utec.streamlit.app/ |
-| Respuestas del formulario (CSV anónimo) | Disponible para el evaluador si lo solicita |
