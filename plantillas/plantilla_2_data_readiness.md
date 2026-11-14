@@ -61,7 +61,7 @@ RECURSO 3 — Corpus RAG
 nivel_preparacion ∈ {básico, intermedio, avanzado}
 ```
 
-**Estado actual PC2:** 🟢 — cuestionario aplicado a 7 usuarios externos como instrumento pre/post para medición de OKRs. La Etapa 1 (clasificador de nivel) quedó fuera del MVP; los datos del cuestionario no se usaron para entrenar un modelo, sino para medir KR1 y KR2.
+**Estado actual PC2:** 🟢 — cuestionario aplicado a 8 usuarios externos como instrumento pre/post para medición de OKRs. La Etapa 1 (clasificador de nivel) quedó fuera del MVP; los datos del cuestionario no se usaron para entrenar un modelo, sino para medir KR1 y KR2.
 
 ---
 
@@ -294,7 +294,7 @@ Las respuestas reales de usuarios no se publicarán en el repositorio. La carpet
 
 **Estado general PC2: 🟢 Verde — R2 construido y usado para entrenar los modelos.**
 
-El recurso R2 (`interviewiq_star_v1.csv`, 200 filas) fue construido y usado para entrenar los 4 clasificadores STAR. El recurso R1 fue reutilizado como instrumento pre/post para medir OKRs (n=7 usuarios). El recurso R3 (corpus RAG) no se implementó: el componente generativo bajó de G2 a G1 (Gemini 2.5 Flash con prompt directo).
+El recurso R2 (`interviewiq_star_v1.csv`, 200 filas) fue construido y usado para entrenar los 4 clasificadores STAR. El recurso R1 fue reutilizado como instrumento pre/post para medir OKRs (n=8 usuarios). El recurso R3 (corpus RAG) no se implementó: el componente generativo bajó de G2 a G1 (Gemini 2.5 Flash con prompt directo).
 
 ---
 
