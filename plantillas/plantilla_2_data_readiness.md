@@ -247,15 +247,16 @@ Los puntos amarillos requieren trabajo antes de PC2 (ver plan abajo).
 | Recurso | Dimensión / problema | Acción concreta | Responsable | Fecha límite | Plan B |
 |---|---|---|---|---|---|
 | R1 | Cuestionario no aplicado | Aplicar sesión piloto; ajustar variables según respuestas | Lucía | Semana 7 | Complementar con compañeros del equipo |
+| R1 | Análisis pre/post OKRs | Tabular resultados del cuestionario pre/post y calcular variación por KR | Jennifer | Semana 14 | Usar porcentajes directos sin análisis estadístico |
 | R2 | Dataset no construido | Definir esquema CSV final y construir primeros ~50 pares sintéticos | Aaron | Semana 7 | Reducir a 150 pares documentando la limitación |
 | R2 | Protocolo STAR pendiente | Crear guía de etiquetado con ejemplos para cada componente | Lucía | Semana 7 | Ronda piloto y corrección antes del etiquetado completo |
-| R2 | Consistencia de etiquetas | Doble etiquetado de ~30 pares; medir y documentar kappa de Cohen | Lucía + equipo | Semana 8 | Reentrenar anotadores con ejemplos frontera y repetir |
+| R2 | Consistencia de etiquetas | Doble etiquetado de ~30 pares; medir y documentar kappa de Cohen | Jennifer + Lucía | Semana 8 | Reentrenar anotadores con ejemplos frontera y repetir |
 | R2 | Balance por etiqueta desconocido | Contar positivos/negativos para S, T, A y R; corregir subrepresentación | Aaron | Semana 8 | Generar ejemplos adicionales para etiquetas con menor representación |
 | R2 | Leakage pendiente de validar | Revisar columnas; hacer split agrupado por pregunta/plantilla | Aaron | Semana 9 | Agrupar por origen antes de dividir |
-| R2 | Consentimiento pendiente | Preparar formulario para respuestas reales | Lucía | Semana 7 | — |
+| R2 | Consentimiento pendiente | Preparar formulario para respuestas reales | Jennifer | Semana 7 | — |
 | R3 | Corpus definitivo pendiente | Seleccionar, guardar y documentar fuentes finales del MVP | Valeria | Semana 7 | Reducir a fuentes institucionales/académicas de mayor relevancia |
 | R3 | Condiciones de uso | Registrar URL, autor, fecha y licencia de cada fuente | Valeria | Semana 7 | No indexar fuentes cuya reutilización no pueda justificarse |
-| R3 | Retrieval no probado | Crear consultas de prueba y verificar recuperación top-k | Valeria + Aaron | Semana 10 | Ajustar chunking, embeddings o corpus según errores encontrados |
+| R3 | Retrieval no probado | Crear consultas de prueba y verificar recuperación top-k | Jennifer + Aaron | Semana 10 | Ajustar chunking, embeddings o corpus según errores encontrados |
 
 ---
 
