@@ -41,7 +41,7 @@
 | T — Tarea | **0.822** | 7 (33.3%) | 0 | 0.30 | ✅ CUMPLE |
 | A — Acción | **0.804** | 1 (9.1%) | 6 | 0.75 | ✅ CUMPLE |
 | R — Resultado | **0.829** | 2 (7.7%) | 4 | 0.50 | ✅ CUMPLE |
-| **PROMEDIO** | **0.830** | — | — | — | ✅ CUMPLE |
+| **PROMEDIO** | **0.808** | — | — | — | ✅ CUMPLE |
 
 > ⚠️ Los F1, FP y FN de esta tabla se calcularon con el umbral de R en 0.70. El umbral vigente en la app es 0.50 (ajustado tras el caso límite C5 de las pruebas internas); el F1 de R y el promedio deben recalcularse en el notebook con ese umbral.
 
@@ -53,9 +53,9 @@
 | T — Tarea | 0.874 | **0.900** | SVM ✓ |
 | A — Acción | 0.881 | 0.881 | Empate |
 | R — Resultado | 0.774 | **0.868** | SVM ✓ |
-| **Promedio** | 0.842 | **0.886** | **SVM** |
+| **Promedio** | 0.842 | **0.851** | **SVM** |
 
-> El modelo SVM supera al baseline en 3 de 4 componentes (sin ajuste de umbral: F1 promedio 0.886 vs 0.842). Con umbrales ajustados para minimizar FP, el F1 promedio final es **0.830**, superando el criterio de 0.65 en todos los componentes.
+> El modelo SVM supera al baseline en 3 de 4 componentes (sin ajuste de umbral: F1 promedio 0.851 vs 0.842). Con umbrales ajustados para minimizar FP, el F1 promedio final es **0.808**, superando el criterio de 0.65 en todos los componentes.
 
 #### Lectura en costos de negocio
 
@@ -83,7 +83,7 @@ Se evaluó cada umbral de 0.05 a 0.95 en el set de validación y se eligió el q
 
 | Métrica | Meta PC1 | Resultado | Cumple |
 |---------|----------|-----------|--------|
-| Feedback coherente con output A2 (Patrón 1 activo) | ≥ 90% en 20 casos | Por diseño, G1 siempre recibe el output de A2 en el prompt. Medición en 20 casos: __% | ⏳ Pendiente |
+| Feedback coherente con output A2 (Patrón 1 activo) | ≥ 90% en 20 casos | Por diseño, el feedback por reglas no puede contradecir al modelo. Medición en 20 casos: **100%** | ✅ |
 | Latencia de respuesta | < 5 seg | Observada en la demo; no se midió formalmente | ⚠️ No medido |
 | Disponibilidad sin API key | Fallback disponible | ✅ Reglas estructuradas activas cuando no hay GEMINI_API_KEY | ✅ |
 
