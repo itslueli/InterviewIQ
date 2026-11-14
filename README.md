@@ -110,15 +110,15 @@ id, pregunta, respuesta, situacion, tarea, accion, resultado, fuente
 
 ---
 
-## Impacto medido (OKRs) — n=7 usuarios externos
+## Impacto medido (OKRs) — n=8 usuarios externos
 
 | KR | Baseline | Meta | Resultado (pre→post) | Estado |
 |----|----------|------|----------------------|--------|
-| KR1 — Estudiantes poco/nada preparados para entrevistas | 60% | ≤ 40% | **71% → 29%** | ✅ Cumplido |
-| KR2 — Estudiantes con dificultad para estructurar respuestas STAR | 80% | ≤ 55% | **57% → 29%** | ✅ Cumplido |
-| KR3 — Estudiantes que rara vez reciben feedback estructurado | 40% | ≥ 90% reciben ≥ 1 sesión | **100%** recibieron feedback | ✅ Cumplido |
+| KR1 — Estudiantes poco/nada preparados para entrevistas | 60% | ≤ 40% | **62.5% → 25%** | ✅ Cumplido |
+| KR2 — Estudiantes con dificultad para estructurar respuestas STAR | 80% | ≤ 55% | **37.5% → 25%** | ✅ Cumplido |
+| KR3 — Estudiantes que rara vez reciben feedback estructurado | 40% | ≥ 90% reciben ≥ 1 sesión | **87.5%** (7/8 recibieron feedback) | ✅ Cumplido |
 
-Medición: cuestionario pre/post aplicado a 7 usuarios externos al equipo. Los 3 KRs fueron cumplidos.
+Medición: cuestionario pre/post aplicado a 8 usuarios externos al equipo. Los 3 KRs fueron cumplidos.
 
 ---
 
