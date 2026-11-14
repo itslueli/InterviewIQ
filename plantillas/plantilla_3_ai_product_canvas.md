@@ -7,9 +7,12 @@
 **Equipo:**
 - Integrante 1: Valeria Briceño
 - Integrante 2: Lucía Rodríguez
-- Integrante 3: Aaron Van Oord
+- Integrante 3: Jennifer Patiño
+- Integrante 4: Aaron Van Oord
 
 **Proyecto:** InterviewIQ — Simulador Inteligente de Entrevistas para Universitarios
+
+> **Nota de versión final (PC2 — Semana 14):** Esta plantilla corresponde al diseño original (PC1). El MVP implementado realizó dos ajustes: (1) la **Etapa 1** (clasificador de nivel de preparación con Logistic Regression) quedó fuera del alcance del MVP — no se entrenó ni se desplegó; (2) el componente generativo bajó de **G2 (RAG con GPT-4o-mini + ChromaDB)** a **G1 (Gemini 2.5 Flash vía API REST)** con fallback automático a reglas estructuradas. El flujo del MVP no incluye cuestionario diagnóstico ni generación de preguntas adaptadas: el usuario selecciona una pregunta del banco o escribe la propia, escribe su respuesta, y recibe análisis STAR + feedback de Gemini.
 
 ---
 
@@ -26,45 +29,48 @@ InterviewIQ permite que cualquier estudiante pueda practicar entrevistas conduct
 
 ### 1.4 Descripción funcional del producto
 
-El sistema ofrece un flujo de práctica completo en cuatro etapas:
+> **MVP implementado (PC2):** El flujo se simplificó respecto al diseño original. Etapa 1 (diagnóstico de nivel) quedó fuera del alcance. El componente generativo pasó de G2 (RAG) a G1 (Gemini 2.5 Flash vía API REST).
 
-1. **Diagnóstico inicial:** El estudiante completa un cuestionario breve (5 ítems) sobre su experiencia con entrevistas, conocimiento de la metodología STAR, nivel de confianza y frecuencia de feedback previo. Un clasificador de nivel de preparación (Logistic Regression) asigna al usuario un nivel: `básico`, `intermedio` o `avanzado`.
+El MVP ofrece el siguiente flujo de práctica:
 
-2. **Generación de preguntas adaptadas:** El LLM genera preguntas conductuales ajustadas al rol objetivo del estudiante y a su nivel de preparación detectado en la etapa anterior.
+1. **Selección de pregunta:** El usuario elige una pregunta conductual del banco predefinido o escribe la suya propia (texto libre).
 
-3. **Respuesta y análisis STAR:** El estudiante responde en texto libre. El clasificador STAR (componente A2) detecta la presencia o ausencia de cada componente (Situación, Tarea, Acción, Resultado) en la respuesta.
+2. **Respuesta y análisis STAR:** El usuario escribe su respuesta en texto libre. El clasificador STAR (componente A2 — TF-IDF bigramas + LinearSVC + CalibratedClassifierCV) detecta la presencia o ausencia de cada componente (Situación, Tarea, Acción, Resultado) con umbrales calibrados por etiqueta.
 
-4. **Retroalimentación personalizada:** El pipeline RAG recupera contexto relevante del corpus y el LLM genera feedback específico usando la salida del clasificador A2 y el contexto recuperado.
+3. **Retroalimentación personalizada:** Gemini 2.5 Flash recibe la respuesta original más las predicciones S/T/A/R y genera feedback específico. Si la API key no está disponible, el sistema usa reglas estructuradas como fallback automático.
 
-**Flujo completo del sistema:**
+**Flujo del MVP implementado:**
 
 ```
-[Selección de rol objetivo]
-        ↓
-[Cuestionario diagnóstico — 5 ítems]
-        ↓
-[Clasificador de nivel — Logistic Regression]
-Output: nivel ∈ {básico, intermedio, avanzado}
-        ↓
-[Generación de preguntas conductuales adaptadas al rol y nivel — LLM]
+[Selección de pregunta del banco o texto libre]
         ↓
 [Respuesta del usuario en texto libre]
         ↓
-[Clasificador STAR — A2 (TF-IDF + LR baseline vs TF-IDF + SVM)]
-Output: S ∈ {0,1}, T ∈ {0,1}, A ∈ {0,1}, R ∈ {0,1}
+[Clasificador STAR — A2 (TF-IDF bigramas + LinearSVC + CalibratedClassifierCV)]
+Output: S ∈ {0,1}, T ∈ {0,1}, A ∈ {0,1}, R ∈ {0,1} con umbrales por etiqueta
         ↓
-[RAG — recuperación de contexto del corpus (FAISS/ChromaDB)]
-        ↓
-[LLM — genera feedback personalizado con salida A2 + contexto recuperado]
+[G1 — Gemini 2.5 Flash vía API REST]
+Input: respuesta + predicciones STAR
+Output: feedback personalizado
+(fallback: reglas estructuradas si no hay GEMINI_API_KEY)
         ↓
 [Feedback mostrado al estudiante]
+```
+
+**Flujo original diseñado (PC1 — no implementado en MVP):**
+
+```
+[Cuestionario diagnóstico] → [Clasificador de nivel — Etapa 1] → [Preguntas adaptadas — LLM]
+→ [Respuesta] → [Clasificador STAR A2] → [RAG corpus] → [LLM feedback — G2]
 ```
 
 ---
 
 ## SECCIÓN 2 — Model Design Canvas
 
-### 2.1 Componente analítico — Etapa 1: Clasificador de nivel de preparación
+### 2.1 Componente analítico — Etapa 1: Clasificador de nivel de preparación *(diseño original — no implementado en MVP)*
+
+> **Estado en MVP:** Quedó fuera del alcance. No se entrenó ni desplegó. Documentado como deuda técnica en `plantillas/plantilla_4_scorecard_risk.md`.
 
 | Elemento | Detalle |
 |---|---|
@@ -78,9 +84,9 @@ Output: S ∈ {0,1}, T ∈ {0,1}, A ∈ {0,1}, R ∈ {0,1}
 | **Métrica principal** | Accuracy |
 | **Criterio mínimo de aceptación** | Accuracy ≥ 0.65 en validación |
 | **Costo del error** | Bajo: error de clasificación de nivel ajusta la dificultad de preguntas; no afecta directamente la evaluación de respuestas |
-| **¿Se usará para entrenar G2?** | No directamente — el nivel detectado se pasa como parámetro al prompt de generación de preguntas |
+| **Estado final** | ❌ No implementado — deuda técnica |
 
-### 2.2 Componente analítico — Etapa 2: Clasificador STAR (A2 principal)
+### 2.2 Componente analítico — Clasificador STAR (A2 — implementado ✅)
 
 | Elemento | Detalle |
 |---|---|
@@ -88,35 +94,47 @@ Output: S ∈ {0,1}, T ∈ {0,1}, A ∈ {0,1}, R ∈ {0,1}
 | **Input** | Respuesta del usuario en texto libre (variable `answer`) |
 | **Output** | Vector binario (S, T, A, R) ∈ {0,1}⁴ |
 | **Algoritmo baseline** | TF-IDF + Logistic Regression (OneVsRest) |
-| **Algoritmo alternativo** | TF-IDF + Linear SVM (OneVsRest) |
-| **Dataset de entrenamiento** | Recurso 2 — InterviewIQ-STAR (~200 pares etiquetados) |
+| **Algoritmo implementado** | TF-IDF bigramas + LinearSVC + CalibratedClassifierCV (mejor resultado) |
+| **Dataset de entrenamiento** | Recurso 2 — InterviewIQ-STAR (200 pares etiquetados) |
 | **Split** | 70% entrenamiento / 10% validación / 20% test |
 | **Métrica principal** | Macro F1 (promedia las 4 etiquetas con igual peso) |
+| **Resultado obtenido** | **F1 promedio = 0.830** ✅ (supera criterio mínimo) |
 | **Criterio mínimo de aceptación** | Macro F1 ≥ 0.65 sobre el conjunto de test |
-| **Costo del error** | **Falso positivo más costoso:** indicar que un componente STAR está presente cuando no lo está significa decirle al estudiante que su respuesta es buena cuando no lo es. El umbral se ajustará por etiqueta en validación priorizando reducir falsos positivos. |
-| **¿Se usará para entrenar G2?** | Sí — las predicciones (S, T, A, R) se pasan directamente al prompt de G2 |
+| **Umbrales calibrados por etiqueta** | situacion=0.30, tarea=0.30, accion=0.75, resultado=0.50 |
+| **Costo del error** | **Falso positivo más costoso:** indicar que un componente STAR está presente cuando no lo está significa decirle al estudiante que su respuesta es buena cuando no lo es. Los umbrales se ajustaron por etiqueta priorizando reducir falsos positivos. |
+| **¿Se pasa al componente generativo?** | Sí — las predicciones (S, T, A, R) se pasan directamente al prompt de G1 |
 
-### 2.3 Componente generativo — G2 (RAG)
+### 2.3 Componente generativo — G1 (implementado ✅) / G2 diseño original
+
+> **MVP:** Se implementó G1 (Gemini 2.5 Flash vía API REST). G2 (RAG con GPT-4o-mini) quedó como deuda técnica.
+
+**G1 — Implementado en MVP:**
 
 | Elemento | Detalle |
 |---|---|
-| **Tipo de tarea** | Generación de texto (preguntas conductuales y feedback personalizado) |
-| **Input de la generación de preguntas** | Nivel detectado (Etapa 1) + rol objetivo del estudiante |
-| **Input del feedback** | Respuesta original del usuario + predicciones S/T/A/R (Etapa 2) + contexto recuperado del corpus |
+| **Tipo de tarea** | Generación de texto (feedback personalizado sobre la respuesta STAR) |
+| **Modelo LLM** | Gemini 2.5 Flash (Google AI) |
+| **Integración** | API REST con `requests`; clave en Streamlit secrets (`GEMINI_API_KEY`) |
+| **Input** | Respuesta original del usuario + predicciones S/T/A/R del clasificador A2 |
+| **Output** | Feedback personalizado: fortalezas, componentes ausentes y recomendaciones |
+| **Fallback** | Reglas estructuradas automáticas si no hay `GEMINI_API_KEY` |
+| **Restricciones del system prompt** | El LLM no puede: (1) inventar experiencias del usuario, (2) afirmar probabilidades de contratación, (3) contradecir la salida de A2, (4) marcar como presentes componentes que A2 marcó ausentes |
+| **¿Depende del componente analítico?** | Sí (Patrón 1: Modelo → Lenguaje) — G1 siempre recibe las predicciones de A2 antes de generar feedback |
+
+**G2 — Diseño original (no implementado — deuda técnica):**
+
+| Elemento | Detalle |
+|---|---|
 | **Modelo LLM** | GPT-4o-mini (API OpenAI) |
 | **Corpus RAG** | ~20–50 documentos sobre metodología STAR y competencias por rol (Recurso 3) |
-| **Chunking** | 300–500 tokens por chunk, sin cortar oraciones |
 | **Embeddings** | text-embedding-3-small (OpenAI) |
-| **Índice vectorial** | FAISS o ChromaDB (local) |
+| **Índice vectorial** | FAISS o ChromaDB |
 | **Retrieval** | Top-k (k=3–5) por similitud coseno |
-| **Métrica RAG** | Retrieval precision@k sobre conjunto de consultas de prueba |
-| **Criterio mínimo de aceptación RAG** | Precision@k ≥ 0.80 |
-| **Restricciones del system prompt** | El LLM no puede: (1) inventar experiencias del usuario, (2) afirmar probabilidades de contratación, (3) contradecir la salida del modelo A2, (4) recomendar componentes STAR como presentes si A2 los marcó como ausentes |
-| **¿Depende del componente analítico?** | Sí (Patrón 1: Modelo → Lenguaje) — G2 siempre recibe las predicciones de A2 antes de generar feedback |
+| **Estado** | ❌ No implementado — deuda técnica documentada en plantilla_4 |
 
 ### 2.4 Patrón de conexión entre componentes
 
-- [x] **Patrón 1 — Modelo → Lenguaje:** La salida del clasificador de nivel alimenta la generación de preguntas; la salida del clasificador STAR alimenta la generación de feedback. G2 no opera de manera independiente.
+- [x] **Patrón 1 — Modelo → Lenguaje:** La salida del clasificador STAR (A2) alimenta la generación de feedback. G1 no opera de manera independiente — siempre recibe las predicciones S/T/A/R antes de generar el feedback.
 - [ ] **Patrón 2 — Lenguaje → Modelo**
 - [ ] **Patrón 3 — Modelo como herramienta del agente**
 
@@ -126,20 +144,21 @@ Output: S ∈ {0,1}, T ∈ {0,1}, A ∈ {0,1}, R ∈ {0,1}
 
 ### 3.1 Inputs del sistema
 
-| Input | Descripción | Formato | Momento en el flujo |
-|---|---|---|---|
-| Rol objetivo | Puesto al que aplica el estudiante | Texto libre o selección de lista | Antes del cuestionario |
-| Cuestionario diagnóstico | 5 ítems sobre experiencia, confianza, conocimiento STAR y feedback previo | Variables ordinales/numéricas | Inicio de la sesión |
-| Respuesta conductual | Respuesta del estudiante a la pregunta generada | Texto libre | Sesión de práctica |
+| Input | Descripción | Formato | Momento en el flujo | Estado MVP |
+|---|---|---|---|---|
+| Pregunta conductual | Pregunta seleccionada del banco o escrita por el usuario | Texto libre o selección | Inicio de la sesión | ✅ Implementado |
+| Respuesta conductual | Respuesta del estudiante a la pregunta | Texto libre | Sesión de práctica | ✅ Implementado |
+| Rol objetivo | Puesto al que aplica el estudiante | Selección de lista | Inicio *(diseño original)* | ⚠️ Banco fijo en MVP |
+| Cuestionario diagnóstico | 5 ítems sobre experiencia, confianza, conocimiento STAR | Variables ordinales | Inicio *(diseño original)* | ❌ No implementado |
 
 ### 3.2 Outputs del sistema
 
-| Output | Descripción | Generado por |
-|---|---|---|
-| Nivel de preparación | `básico` / `intermedio` / `avanzado` | Clasificador de nivel (Etapa 1) |
-| Preguntas conductuales adaptadas | Preguntas ajustadas al rol y nivel | LLM (G2) |
-| Predicciones STAR | S/T/A/R ∈ {0,1} por componente | Clasificador STAR (Etapa 2) |
-| Feedback personalizado | Análisis con fortalezas, componentes ausentes y recomendaciones de mejora | LLM con RAG (G2) |
+| Output | Descripción | Generado por | Estado MVP |
+|---|---|---|---|
+| Predicciones STAR | S/T/A/R ∈ {0,1} con probabilidad por componente | Clasificador STAR A2 (TF-IDF + SVM) | ✅ Implementado |
+| Feedback personalizado | Análisis con fortalezas, componentes ausentes y recomendaciones | Gemini 2.5 Flash (G1) o reglas fallback | ✅ Implementado |
+| Nivel de preparación | `básico` / `intermedio` / `avanzado` | Clasificador Etapa 1 *(diseño original)* | ❌ No implementado |
+| Preguntas adaptadas | Preguntas ajustadas al rol y nivel | LLM G2 *(diseño original)* | ❌ No implementado |
 
 ---
 
@@ -150,19 +169,22 @@ Incrementar la preparación percibida y la capacidad de estructurar respuestas c
 
 ### Key Results
 
-| KR | Indicador | Baseline (encuesta propia, n=50) | Meta con MVP | Medición |
-|---|---|---|---|---|
-| **KR1** | % de estudiantes que se sienten poco o nada preparados para entrevistas por competencias | **60%** | ≤ 40% tras uso del MVP | Cuestionario pre/post (n ≥ 15 usuarios) |
-| **KR2** | % de estudiantes con dificultad para estructurar respuestas conductuales (STAR) | **80%** | ≤ 55% tras sesiones de práctica | Cuestionario pre/post (n ≥ 15 usuarios) |
-| **KR3** | % de estudiantes que rara vez o nunca reciben retroalimentación estructurada | **40%** | ≥ 90% reciben feedback en al menos 1 sesión | Registro de uso del MVP |
+| KR | Indicador | Baseline (n=50) | Meta | Resultado MVP (n=7) | Estado |
+|---|---|---|---|---|---|
+| **KR1** | % que se sienten poco o nada preparados | **60%** | ≤ 40% | **71% → 29%** (pre/post) | ✅ Cumplido |
+| **KR2** | % con dificultad para estructurar respuestas STAR | **80%** | ≤ 55% | **57% → 29%** (pre/post) | ✅ Cumplido |
+| **KR3** | % que nunca reciben feedback estructurado | **40%** | ≥ 90% reciben ≥ 1 sesión | **100%** recibieron feedback | ✅ Cumplido |
+
+> Medición aplicada con cuestionario pre/post a 7 usuarios externos al equipo (n=7). Los 3 KRs fueron cumplidos.
 
 ### Métricas técnicas
 
-| Componente | Métrica | Criterio mínimo |
-|---|---|---|
-| Clasificador de nivel (Etapa 1) | Accuracy en test | ≥ 0.65 |
-| Clasificador STAR A2 (Etapa 2) | Macro F1 en test | ≥ 0.65 |
-| Pipeline RAG G2 | Retrieval precision@k | ≥ 0.80 |
+| Componente | Métrica | Criterio mínimo | Resultado |
+|---|---|---|---|
+| Clasificador STAR A2 | Macro F1 en test | ≥ 0.65 | **0.830** ✅ |
+| G1 Gemini 2.5 Flash | Coherencia de feedback con predicciones A2 | Fallback funcional | ✅ Implementado con fallback |
+| Clasificador Etapa 1 | Accuracy en test | ≥ 0.65 | ❌ No implementado |
+| Pipeline RAG G2 | Retrieval precision@k | ≥ 0.80 | ❌ No implementado |
 
 ---
 
@@ -170,53 +192,60 @@ Incrementar la preparación percibida y la capacidad de estructurar respuestas c
 
 ### 5.1 Stack tecnológico
 
-| Capa | Tecnología |
-|---|---|
-| Interfaz | Streamlit |
-| Clasificador de nivel | scikit-learn (Logistic Regression) |
-| Clasificador STAR | scikit-learn (TF-IDF + LR y TF-IDF + LinearSVC) |
-| Embeddings | OpenAI text-embedding-3-small |
-| Índice vectorial | FAISS o ChromaDB (local) |
-| LLM | GPT-4o-mini (API OpenAI) |
-| Despliegue | Streamlit Community Cloud (URL pública) |
+| Capa | Tecnología diseño original (PC1) | Tecnología MVP implementado (PC2) |
+|---|---|---|
+| Interfaz | Streamlit | Streamlit ✅ |
+| Clasificador de nivel | scikit-learn (Logistic Regression) | ❌ No implementado |
+| Clasificador STAR | scikit-learn (TF-IDF + LR y LinearSVC) | scikit-learn (TF-IDF bigramas + LinearSVC + CalibratedClassifierCV) ✅ |
+| Embeddings | OpenAI text-embedding-3-small | ❌ No aplica (G2 no implementado) |
+| Índice vectorial | FAISS o ChromaDB | ❌ No aplica (G2 no implementado) |
+| LLM | GPT-4o-mini (API OpenAI) | Gemini 2.5 Flash (API REST con `requests`) ✅ |
+| Despliegue | Streamlit Community Cloud | Streamlit Community Cloud ✅ |
 
 ### 5.2 Alcance del MVP
 
-**Incluido:**
-- Cuestionario diagnóstico (5 ítems) + clasificación de nivel
-- Selección de rol objetivo (lista predefinida)
-- Generación de preguntas conductuales adaptadas al rol y nivel
-- Análisis STAR de la respuesta
-- Feedback personalizado (RAG + LLM)
+**Implementado ✅:**
+- Banco de preguntas conductuales predefinidas + opción de texto libre
+- Análisis STAR de la respuesta (clasificador A2)
+- Feedback personalizado (Gemini 2.5 Flash con fallback a reglas estructuradas)
 - Interfaz web accesible desde cualquier dispositivo
+- Despliegue público en https://interviewiq-utec.streamlit.app/
 
-**Excluido del MVP:**
+**Quedó fuera del MVP ❌ (deuda técnica):**
+- Cuestionario diagnóstico + clasificación de nivel (Etapa 1)
+- Generación de preguntas adaptadas al rol y nivel
+- Pipeline RAG (corpus, embeddings, índice vectorial) — G2
 - Autenticación de usuarios
 - Base de datos persistente de sesiones
-- Audio o video
-- Análisis de CV o carta de presentación
-- Soporte multilingüe
 
-### 5.3 Diagrama de componentes
+### 5.3 Diagrama de componentes (MVP implementado)
 
 ```
-┌────────────────────────────────────────────────────────┐
-│                   Interfaz Streamlit                   │
-│  [Cuestionario] → [Selección rol] → [Práctica] → [FB] │
-└────────────┬───────────────────────────────┬───────────┘
-             │                               │
-    ┌────────▼────────┐             ┌────────▼────────┐
-    │ Clasificador    │             │ Clasificador    │
-    │ de Nivel        │             │ STAR (A2)       │
-    │ (Logistic Reg.) │             │ TF-IDF + LR/SVM │
-    │ Output: nivel   │             │ Output: S,T,A,R │
-    └────────┬────────┘             └────────┬────────┘
-             │                               │
-    ┌────────▼────────────────────────────────▼────────┐
-    │              Pipeline RAG + LLM (G2)             │
-    │  Corpus → Chunks → Embeddings → FAISS → top-k   │
-    │  LLM (GPT-4o-mini) → preguntas y feedback       │
-    └──────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│                  Interfaz Streamlit                  │
+│  [Banco de preguntas / texto libre] → [Respuesta]   │
+└────────────────────────┬─────────────────────────────┘
+                         │
+              ┌──────────▼──────────┐
+              │  Clasificador STAR  │
+              │       (A2)          │
+              │  TF-IDF bigramas +  │
+              │  LinearSVC + Calib. │
+              │  F1 promedio=0.830  │
+              │  Output: S,T,A,R   │
+              └──────────┬──────────┘
+                         │  predicciones + respuesta original
+              ┌──────────▼──────────┐
+              │  G1 — Gemini 2.5   │
+              │  Flash (API REST)  │
+              │  Fallback: reglas  │
+              │  Output: feedback  │
+              └──────────┬──────────┘
+                         │
+              ┌──────────▼──────────┐
+              │  Feedback al        │
+              │  estudiante         │
+              └─────────────────────┘
 ```
 
 ---
@@ -237,12 +266,12 @@ Incrementar la preparación percibida y la capacidad de estructurar respuestas c
 
 | Pregunta de control | Respuesta |
 |---|---|
-| ¿El flujo completo del sistema (cuestionario → nivel → preguntas → respuesta → STAR → RAG → feedback) está descrito? | **SÍ** |
-| ¿Los dos componentes analíticos (clasificador de nivel + clasificador STAR) están diferenciados con inputs, outputs y métricas propias? | **SÍ** |
-| ¿El componente generativo G2 usa RAG y depende de la salida de A2? | **SÍ** |
+| ¿El flujo del MVP implementado está descrito (pregunta → respuesta → STAR → G1 → feedback)? | **SÍ** |
+| ¿El componente analítico A2 (clasificador STAR) está documentado con inputs, outputs, algoritmo y resultado F1? | **SÍ — F1=0.830** |
+| ¿El componente generativo G1 (Gemini) depende de la salida de A2 y tiene fallback documentado? | **SÍ** |
 | ¿El patrón de conexión (Modelo → Lenguaje) está justificado? | **SÍ** |
-| ¿Las métricas técnicas y los OKRs de impacto están definidos con criterios mínimos de aceptación? | **SÍ** |
-| ¿El alcance del MVP está delimitado con lo que incluye y lo que excluye? | **SÍ** |
+| ¿Los OKRs tienen baseline, meta y resultado real (n=7)? | **SÍ — 3/3 KRs cumplidos** |
+| ¿El alcance del MVP está delimitado con lo implementado y lo que quedó fuera? | **SÍ** |
 | ¿Los riesgos críticos tienen mitigaciones concretas? | **SÍ** |
-| ¿El baseline del KR3 (40%) es el valor real de la encuesta? | **SÍ — 40%, no 10%** |
+| ¿El stack refleja lo que se desplegó (Gemini, no GPT-4o-mini; sin FAISS/ChromaDB)? | **SÍ** |
 | ¿El equipo puede explicar el producto completo sin leer este canvas? | **SÍ** |
