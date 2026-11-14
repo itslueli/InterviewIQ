@@ -94,7 +94,7 @@ id, pregunta, respuesta, situacion, tarea, accion, resultado, fuente
 | T — Tarea | **0.822** | 0.30 | ✅ CUMPLE |
 | A — Acción | **0.804** | 0.75 | ✅ CUMPLE |
 | R — Resultado | **0.829** | 0.50 | ✅ CUMPLE |
-| **Promedio** | **0.830** | — | ✅ CUMPLE |
+| **Promedio** | **0.808** | — | ✅ CUMPLE |
 
 #### Comparación baseline vs modelo final
 
@@ -104,7 +104,7 @@ id, pregunta, respuesta, situacion, tarea, accion, resultado, fuente
 | T — Tarea | 0.874 | **0.900** | SVM ✓ |
 | A — Acción | 0.881 | 0.881 | Empate |
 | R — Resultado | 0.774 | **0.868** | SVM ✓ |
-| **Promedio** | 0.842 | **0.886** | **SVM** |
+| **Promedio** | 0.842 | **0.851** | **SVM** |
 
 > Los umbrales fueron ajustados en validación priorizando minimizar Falsos Positivos (el error más costoso en este dominio: decirle al estudiante que un componente está presente cuando no lo está).
 
