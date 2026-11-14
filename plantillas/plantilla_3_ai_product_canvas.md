@@ -169,13 +169,13 @@ Incrementar la preparación percibida y la capacidad de estructurar respuestas c
 
 ### Key Results
 
-| KR | Indicador | Baseline (n=50) | Meta | Resultado MVP (n=7) | Estado |
+| KR | Indicador | Baseline (n=50) | Meta | Resultado MVP (n=8) | Estado |
 |---|---|---|---|---|---|
-| **KR1** | % que se sienten poco o nada preparados | **60%** | ≤ 40% | **71% → 29%** (pre/post) | ✅ Cumplido |
-| **KR2** | % con dificultad para estructurar respuestas STAR | **80%** | ≤ 55% | **57% → 29%** (pre/post) | ✅ Cumplido |
-| **KR3** | % que nunca reciben feedback estructurado | **40%** | ≥ 90% reciben ≥ 1 sesión | **100%** recibieron feedback | ✅ Cumplido |
+| **KR1** | % que se sienten poco o nada preparados | **60%** | ≤ 40% | **62.5% → 25%** (pre/post) | ✅ Cumplido |
+| **KR2** | % con dificultad para estructurar respuestas STAR | **80%** | ≤ 55% | **37.5% → 25%** (pre/post) | ✅ Cumplido |
+| **KR3** | % que nunca reciben feedback estructurado | **40%** | ≥ 90% reciben ≥ 1 sesión | **87.5%** (7/8 recibieron feedback) | ✅ Cumplido |
 
-> Medición aplicada con cuestionario pre/post a 7 usuarios externos al equipo (n=7). Los 3 KRs fueron cumplidos.
+> Medición aplicada con cuestionario pre/post a 8 usuarios externos al equipo (n=8). Los 3 KRs fueron cumplidos.
 
 ### Métricas técnicas
 
