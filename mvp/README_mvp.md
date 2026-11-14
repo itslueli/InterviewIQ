@@ -111,7 +111,7 @@ Para evaluar el comportamiento del modelo en distintos escenarios:
 | T — Tarea | **0.822** | 0.30 | ✅ |
 | A — Acción | **0.804** | 0.75 | ✅ |
 | R — Resultado | **0.829** | 0.50 | ✅ |
-| **Promedio** | **0.830** | — | ✅ |
+| **Promedio** | **0.808** | — | ✅ |
 
 ---
 
